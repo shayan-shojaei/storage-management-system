@@ -19,6 +19,7 @@ export default class Ingredient {
   name: string;
   unit: Unit;
   amount: number;
+  storage: ObjectId; // Reference to the storage
   createdAt: Date;
 
   /**
@@ -26,10 +27,11 @@ export default class Ingredient {
    * @param {Unit} unit Unit of measurement
    * @param {number} [amount=0] - Amount of ingredient
    */
-  constructor(name: string, unit: Unit, amount = 0) {
+  constructor(name: string, unit: Unit, storage: ObjectId, amount = 0) {
     this.name = name;
     this.unit = unit;
     this.amount = amount;
+    this.storage = storage;
     this.createdAt = new Date();
   }
 }

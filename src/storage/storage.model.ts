@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import Ingredient from 'src/ingredient/ingredient.model';
 
 /**
  * **Storage Model**
@@ -9,14 +8,14 @@ export default class Storage {
 
   _id: ObjectId;
   name: string;
-  ingredients: Ingredient[];
+  ingredients: ObjectId[]; // Reference to Ingredients
   createdAt: Date;
 
   /**
    * @param {string} name Name of storage
-   * @param {Ingredient[]} ingredients List of ingredients in storage
+   * @param {ObjectId[]} ingredients List of ingredients in storage
    */
-  constructor(name: string, ingredients: Ingredient[] = []) {
+  constructor(name: string, ingredients: ObjectId[] = []) {
     this.name = name;
     this.ingredients = ingredients;
     this.createdAt = new Date();
