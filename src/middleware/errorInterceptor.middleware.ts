@@ -1,5 +1,4 @@
 import {
-  BadGatewayException,
   CallHandler,
   ExecutionContext,
   Injectable,
@@ -20,7 +19,7 @@ export class ErrorInterceptor implements NestInterceptor {
         }
 
         // Throw non-mapped errors
-        return throwError(() => new BadGatewayException());
+        return throwError(() => err);
       }),
     );
   }
