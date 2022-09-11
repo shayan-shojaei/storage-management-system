@@ -1,0 +1,35 @@
+import { ObjectId } from 'mongodb';
+
+/**
+ * **Measurement Units** \
+ * KG (Kilograms)
+ * G (Grams) \
+ * L (Litres)
+ * ML (Mililitres) \
+ * M (Meters)
+ * CM (Centimeters)
+ */
+export type Unit = 'KG' | 'G' | 'L' | 'ML' | 'M' | 'CM';
+
+/**
+ * **Ingredient Model**
+ */
+export default class Ingredient {
+  _id: ObjectId;
+  name: string;
+  unit: Unit;
+  amount: number;
+  createdAt: Date;
+
+  /**
+   * @param {string} name Name of ingredient (*Unique in storage*)
+   * @param {Unit} unit Unit of measurement
+   * @param {number} [amount=0] - Amount of ingredient
+   */
+  constructor(name: string, unit: Unit, amount = 0) {
+    this.name = name;
+    this.unit = unit;
+    this.amount = amount;
+    this.createdAt = new Date();
+  }
+}
