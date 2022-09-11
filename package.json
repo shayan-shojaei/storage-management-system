@@ -35,6 +35,8 @@
     "@nestjs/swagger": "^6.1.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "helmet": "^6.0.0",
     "mongodb": "^4.9.1",
     "nest-mongodb": "^6.4.0",
     "reflect-metadata": "^0.1.13",
