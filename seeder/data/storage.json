@@ -1,0 +1,26 @@
+[
+  {
+    "_id": "631d9d675237167ab2c1b75e",
+    "name": "Storage #1",
+    "ingredients": [],
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631d91b05f233e605c28b4bf",
+    "name": "Storage #2",
+    "ingredients": [],
+    "createdAt": "2022-09-11T07:43:44.236Z"
+  },
+  {
+    "_id": "631d9995ea642c9181db3186",
+    "name": "Storage #3",
+    "ingredients": [],
+    "createdAt": "2022-09-11T08:17:25.059Z"
+  },
+  {
+    "_id": "631da18f07c515bbae864eb1",
+    "name": "storage #4",
+    "ingredients": [],
+    "createdAt": "2022-09-11T08:51:27.794Z"
+  }
+]
