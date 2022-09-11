@@ -1,8 +1,8 @@
 {
   "name": "restaurant-management",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Restaurant Management System",
+  "author": "shayan-shojaei",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -16,7 +16,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -26,8 +26,11 @@
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
+    "mongodb": "^4.9.1",
+    "nest-mongodb": "^6.4.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
