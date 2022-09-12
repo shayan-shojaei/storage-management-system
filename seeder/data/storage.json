@@ -2,13 +2,22 @@
   {
     "_id": "631d9d675237167ab2c1b75e",
     "name": "Storage #1",
-    "ingredients": [],
+    "ingredients": [
+      "631ec9cde869232f182c3d5f",
+      "631ec9cde869232f182c3d60",
+      "631ec9cde869232f182c3d61"
+    ],
     "createdAt": "2022-09-11T08:33:43.458Z"
   },
   {
     "_id": "631d91b05f233e605c28b4bf",
     "name": "Storage #2",
-    "ingredients": [],
+    "ingredients": [
+      "631ec9cde869232f182c3d65",
+      "631ec9cde869232f182c3d64",
+      "631ec9cde869232f182c3d63",
+      "631ec9cde869232f182c3d62"
+    ],
     "createdAt": "2022-09-11T07:43:44.236Z"
   },
   {
