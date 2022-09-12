@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { connect } from './database';
-import { getCollectionData } from './file';
+import { getIngredients, getStorages } from './file';
 
 // Connect database
 const client = connect();
@@ -12,21 +12,21 @@ const dropDatabase = async () => {
 };
 
 // Import data into collection
-const importData = async (collectionName: string) => {
-  const data = getCollectionData(collectionName).map((doc) => ({
-    ...doc,
-    _id: new ObjectId(doc._id),
-  }));
-  const collection = await client.collection(collectionName);
-  return collection.insertMany(data);
+const importData = async (
+  collectionName: string,
+  getCollection: () => Promise<any[]>,
+) => {
+  const data = await getCollection();
+  const collection = client.collection(collectionName);
+  await collection.insertMany(data);
 };
 
 // Seed data
 const seedDatabase = async () => {
   // Storage
-  await importData('storage');
+  await importData('storage', getStorages);
   // Ingredient
-  // TODO: Add ingredients seeder
+  await importData('ingredient', getIngredients);
 
   console.log('Database seeded successfully.');
 };

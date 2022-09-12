@@ -1,0 +1,58 @@
+[
+  {
+    "_id": "631ec9cde869232f182c3d5f",
+    "name": "Potato",
+    "unit": "KG",
+    "amount": 25,
+    "storage": "631d9d675237167ab2c1b75e",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d60",
+    "name": "Tomato",
+    "unit": "G",
+    "amount": 2500,
+    "storage": "631d9d675237167ab2c1b75e",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d61",
+    "name": "Potato Sauce",
+    "unit": "L",
+    "amount": 40,
+    "storage": "631d9d675237167ab2c1b75e",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d62",
+    "name": "Potato",
+    "unit": "G",
+    "amount": 2000,
+    "storage": "631d91b05f233e605c28b4bf",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d63",
+    "name": "Tomato",
+    "unit": "KG",
+    "amount": 32,
+    "storage": "631d91b05f233e605c28b4bf",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d64",
+    "name": "Potato Sauce",
+    "unit": "ML",
+    "amount": 400,
+    "storage": "631d91b05f233e605c28b4bf",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  },
+  {
+    "_id": "631ec9cde869232f182c3d65",
+    "name": "Beef",
+    "unit": "KG",
+    "amount": 43,
+    "storage": "631d91b05f233e605c28b4bf",
+    "createdAt": "2022-09-11T08:33:43.458Z"
+  }
+]

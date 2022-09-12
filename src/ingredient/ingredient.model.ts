@@ -15,6 +15,8 @@ export type Unit = 'KG' | 'G' | 'L' | 'ML' | 'M' | 'CM';
  * **Ingredient Model**
  */
 export default class Ingredient {
+  static NAME = 'ingredient';
+
   _id: ObjectId;
   name: string;
   unit: Unit;
