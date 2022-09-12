@@ -1,10 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
+import { BatchData } from '../scheduler/models/batchJob.model';
+import Job from '../scheduler/models/job.model';
 import Ingredient from '../ingredient/ingredient.model';
 import { ActionsController } from './actions.controller';
 import { ActionsService } from './actions.service';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
+import BatchScheduleDTO from './dto/schedule.dto';
 
 const ADD_INGREDIENT_1: AddDTO = {
   name: 'I1',
@@ -19,6 +22,11 @@ const ADD_INGREDIENT_2: AddDTO = {
 
 const BATCH_INGREDIENT: BatchDTO = {
   ingredients: [ADD_INGREDIENT_1, ADD_INGREDIENT_2],
+};
+
+const SCHEDULE_INGREDIENTS: BatchScheduleDTO = {
+  cron: '*/10 * * * * *',
+  data: [ADD_INGREDIENT_1, ADD_INGREDIENT_2],
 };
 
 const STORAGE_1 = '631d9d675237167ab2c1b75e';
@@ -49,6 +57,19 @@ describe('ActionsController', () => {
             } as Ingredient),
         ),
       ),
+    scheduleIngredientsBatch: jest.fn().mockImplementation(
+      async (dto: BatchScheduleDTO, storage: string) =>
+        ({
+          _id: new ObjectId(),
+          createdAt: new Date(),
+          cron: dto.cron,
+          data: {
+            data: dto.data,
+            storageId: storage,
+          },
+          type: 'BATCH_ADD',
+        } as Job<BatchData>),
+    ),
     checkStorage: jest
       .fn()
       .mockImplementation((storageId: ObjectId) => ObjectId.isValid(storageId)),
@@ -80,6 +101,7 @@ describe('ActionsController', () => {
       } as Ingredient);
     });
   });
+
   describe('batch', () => {
     it('should add a batch of ingredients', async () => {
       const response = await controller.addBatch(STORAGE_1, BATCH_INGREDIENT);
@@ -101,5 +123,25 @@ describe('ActionsController', () => {
       ] as Ingredient[]);
     });
   });
-  // describe('schedule', () => {});
+
+  describe('schedule', () => {
+    it('should schedule the addition of a batch of ingredients', async () => {
+      const response = await controller.scheduleBatch(
+        STORAGE_1,
+        SCHEDULE_INGREDIENTS,
+      );
+      expect(response).toBeDefined();
+      expect(response.success).toBe(true);
+      expect(response.data).toEqual({
+        _id: expect.any(ObjectId),
+        createdAt: expect.any(Date),
+        type: 'BATCH_ADD',
+        data: {
+          data: SCHEDULE_INGREDIENTS.data,
+          storageId: STORAGE_1,
+        },
+        cron: SCHEDULE_INGREDIENTS.cron,
+      } as Job<BatchData>);
+    });
+  });
 });

@@ -1,10 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
+import Job, { JobType } from '../scheduler/models/job.model';
+import { SchedulerService } from '../scheduler/scheduler.service';
 import Ingredient from '../ingredient/ingredient.model';
 import ActionsRepository from './actions.repository';
 import { ActionsService } from './actions.service';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
+import BatchScheduleDTO from './dto/schedule.dto';
+import { BatchData } from '../scheduler/models/batchJob.model';
 
 const ingredientDTO: AddDTO = {
   name: 'Ingredient Name',
@@ -14,6 +18,15 @@ const ingredientDTO: AddDTO = {
 
 const batchIngredientDTO: BatchDTO = {
   ingredients: [
+    { name: 'Ing1', amount: 200, unit: 'G' },
+    { name: 'Ing2', amount: 4, unit: 'KG' },
+    { name: 'Ing3', amount: 10, unit: 'L' },
+  ],
+};
+
+const scheduleIngredientDTO: BatchScheduleDTO = {
+  cron: '*/10 * * * * *',
+  data: [
     { name: 'Ing1', amount: 200, unit: 'G' },
     { name: 'Ing2', amount: 4, unit: 'KG' },
     { name: 'Ing3', amount: 10, unit: 'L' },
@@ -46,6 +59,18 @@ describe('ActionsService', () => {
     storageExists: jest.fn().mockImplementation(async () => true),
   };
 
+  const mockSchedulerService: Partial<SchedulerService> = {
+    createJob: jest.fn().mockImplementation(
+      (type: JobType, cron: string, data: any) =>
+        ({
+          type,
+          cron,
+          data,
+          _id: new ObjectId(),
+          createdAt: new Date(),
+        } as Job<BatchData>),
+    ),
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -53,6 +78,10 @@ describe('ActionsService', () => {
         {
           provide: ActionsRepository,
           useValue: actionsRepoMock,
+        },
+        {
+          provide: SchedulerService,
+          useValue: mockSchedulerService,
         },
       ],
     }).compile();
@@ -64,29 +93,43 @@ describe('ActionsService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('add single ingredient to storage', () => {
-    it('should create and add single ingredient to storage', async () => {
-      expect(await service.addIngredient(ingredientDTO, storageId)).toEqual({
-        ...ingredientDTO,
-        _id: expect.any(ObjectId),
-        storage: new ObjectId(storageId),
-        createdAt: expect.any(Date),
-      });
+  it('should create and add single ingredient to storage', async () => {
+    expect(await service.addIngredient(ingredientDTO, storageId)).toEqual({
+      ...ingredientDTO,
+      _id: expect.any(ObjectId),
+      storage: new ObjectId(storageId),
+      createdAt: expect.any(Date),
     });
   });
 
-  describe('add batch of ingredients to storage', () => {
-    it('should create and add single ingredient to storage', async () => {
-      expect(
-        await service.addIngredientsBatch(batchIngredientDTO, storageId),
-      ).toEqual(
-        batchIngredientDTO.ingredients.map((ingredient) => ({
-          ...ingredient,
-          _id: expect.any(ObjectId),
-          storage: new ObjectId(storageId),
-          createdAt: expect.any(Date),
-        })),
-      );
-    });
+  it('should add batch of ingredients to storage', async () => {
+    expect(
+      await service.addIngredientsBatch(batchIngredientDTO, storageId),
+    ).toEqual(
+      batchIngredientDTO.ingredients.map((ingredient) => ({
+        ...ingredient,
+        _id: expect.any(ObjectId),
+        storage: new ObjectId(storageId),
+        createdAt: expect.any(Date),
+      })),
+    );
+  });
+
+  it('should schedule the addition of ingredients to storage', async () => {
+    const job = await service.scheduleIngredientsBatch(
+      scheduleIngredientDTO,
+      storageId,
+    );
+    const reponse = {
+      _id: expect.any(ObjectId),
+      createdAt: expect.any(Date),
+      cron: scheduleIngredientDTO.cron,
+      type: 'BATCH_ADD',
+      data: {
+        data: scheduleIngredientDTO.data,
+        storageId,
+      },
+    } as Job<BatchData>;
+    expect(job).toStrictEqual(reponse);
   });
 });

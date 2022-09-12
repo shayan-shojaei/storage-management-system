@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   OnApplicationBootstrap,
@@ -17,8 +19,9 @@ import { CronJob } from 'cron';
 export class SchedulerService implements OnApplicationBootstrap {
   constructor(
     private readonly jobs: SchedulerRepistory,
+    private readonly schedulerRegistry: SchedulerRegistry,
+    @Inject(forwardRef(() => ActionsService))
     private readonly actions: ActionsService,
-    private schedulerRegistry: SchedulerRegistry,
   ) {}
 
   async onApplicationBootstrap() {
@@ -31,20 +34,22 @@ export class SchedulerService implements OnApplicationBootstrap {
     }
   }
 
-  async createJob(name: string, type: JobType, cron: string, data: any) {
+  async createJob(type: JobType, cron: string, data: any) {
     // check cron string validity
-    if (!isValidCron(cron)) {
+    if (!isValidCron(cron, { seconds: true })) {
       throw new BadRequestException(
         `The expression ${cron} is not a valid cron expression.`,
       );
     }
 
-    const createdJob = new Job(type, data, cron);
-    // setup created job's scheduler
-    this.setupJob(createdJob);
-
     // insert job into database
-    return this.jobs.insert(createdJob);
+    const createdJob = new Job(type, data, cron);
+    const job = await this.jobs.insert(createdJob);
+
+    // setup created job's scheduler
+    this.setupJob(job);
+
+    return job;
   }
 
   async deleteJob(id: string) {
@@ -72,7 +77,11 @@ export class SchedulerService implements OnApplicationBootstrap {
 
   private setupBatch(job: Job<BatchData>) {
     const cronJob = new CronJob(job.cron, async () => {
-      await this.actions.addIngredientsBatch(job.data.data, job.data.storageId);
+      const { data: ingredients } = job.data;
+      await this.actions.addIngredientsBatch(
+        { ingredients },
+        job.data.storageId,
+      );
     });
 
     this.schedulerRegistry.addCronJob(job._id.toString(), cronJob);

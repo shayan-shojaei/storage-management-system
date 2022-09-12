@@ -1,6 +1,6 @@
-import BatchDTO from '../../actions/dto/batch.dto';
+import AddDTO from '../../actions/dto/add.dto';
 
 export class BatchData {
   storageId: string;
-  data: BatchDTO;
+  data: AddDTO[];
 }
