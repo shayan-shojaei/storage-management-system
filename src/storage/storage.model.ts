@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
  * **Storage Model**
  */
 export default class Storage {
-  static NAME = 'storage';
+  static readonly NAME = 'storage';
 
   _id: ObjectId;
   name: string;

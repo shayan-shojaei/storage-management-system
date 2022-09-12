@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongoModule } from 'nest-mongodb';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import ActionsModule from './actions/actions.module';
 import IngredientModule from './ingredient/ingredient.module';
 import StorageModule from './storage/storage.module';
@@ -14,6 +15,7 @@ import StorageModule from './storage/storage.module';
     StorageModule,
     IngredientModule,
     ActionsModule,
+    SchedulerModule,
   ],
   controllers: [],
   providers: [],

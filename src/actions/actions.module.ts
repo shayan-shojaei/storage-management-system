@@ -10,5 +10,6 @@ import { ActionsService } from './actions.service';
   imports: [MongoModule.forFeature([Storage.NAME, Ingredient.NAME])],
   controllers: [ActionsController],
   providers: [ActionsService, ActionsRepository],
+  exports: [ActionsService],
 })
 export default class ActionsModule {}

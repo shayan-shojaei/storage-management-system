@@ -16,7 +16,7 @@ export type Unit = typeof UNITS[number];
  * **Ingredient Model**
  */
 export default class Ingredient {
-  static NAME = 'ingredient';
+  static readonly NAME = 'ingredient';
 
   _id: ObjectId;
   name: string;
