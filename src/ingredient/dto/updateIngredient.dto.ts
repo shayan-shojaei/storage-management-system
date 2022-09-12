@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ObjectId } from 'mongodb';
-import { Unit } from '../ingredient.model';
+import { Unit, UNITS } from '../ingredient.model';
 
 export default class UpdateIngredientDTO {
   @ApiProperty()
@@ -9,7 +9,7 @@ export default class UpdateIngredientDTO {
   @IsOptional()
   name: string;
   @ApiProperty()
-  @IsIn(['KG', 'G', 'L', 'ML', 'M', 'CM'])
+  @IsIn(UNITS)
   @IsOptional()
   unit: Unit;
   @ApiProperty()

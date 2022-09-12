@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 
+export const UNITS = ['KG', 'G', 'L', 'ML', 'M', 'CM'] as const;
 /**
  * **Measurement Units** \
  * KG (Kilograms)
@@ -9,7 +10,7 @@ import { ObjectId } from 'mongodb';
  * M (Meters)
  * CM (Centimeters)
  */
-export type Unit = 'KG' | 'G' | 'L' | 'ML' | 'M' | 'CM';
+export type Unit = typeof UNITS[number];
 
 /**
  * **Ingredient Model**
