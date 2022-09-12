@@ -8,11 +8,6 @@ const EXAMPLE_STORAGE: Storage = {
   createdAt: new Date('2022-09-11T08:33:43.458Z'),
 };
 
-export const createSchema = (example: any) => ({
-  type: typeof example,
-  example: example,
-});
-
 export const AllStoragesExample = {
   success: true,
   count: 1,

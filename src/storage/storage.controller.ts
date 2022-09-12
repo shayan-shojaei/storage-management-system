@@ -16,17 +16,19 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
 } from '@nestjs/swagger';
 import UpdateStorageDTO from './dto/updateStorage.dto';
-import { ErrorInterceptor } from 'src/middleware/errorInterceptor.middleware';
+import { ErrorInterceptor } from '../middleware/errorInterceptor.middleware';
 import {
   AllStoragesExample,
-  createSchema,
   DeleteStorageExample,
   SingleStorageExample,
 } from './examples';
+import { createSchema } from '../utils/createSchema';
 
 @Controller('storage')
+@ApiTags('Storage')
 export default class StorageController {
   constructor(private readonly storage: StorageService) {}
 
