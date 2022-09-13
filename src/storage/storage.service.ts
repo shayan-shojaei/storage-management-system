@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import IngredientRepository from 'src/ingredient/ingredient.repository';
+import IngredientRepository from '../ingredient/ingredient.repository';
 import CreateStorageDTO from './dto/createStorage.dto';
 import UpdateStorageDTO from './dto/updateStorage.dto';
 import StorageRepository from './storage.repository';

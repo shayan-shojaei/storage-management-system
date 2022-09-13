@@ -108,7 +108,7 @@ export default class StorageController {
     schema: createSchema(SingleIngredientExample),
   })
   @ApiNotFoundResponse()
-  @ApiOperation({ summary: 'Get ingredient in storage by name.' })
+  @ApiOperation({ summary: 'Get ingredient in storage by name' })
   async getIngredientInStorage(
     @Param('id') id: string,
     @Param('ingredient') ingredientName: string,

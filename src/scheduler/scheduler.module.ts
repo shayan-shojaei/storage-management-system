@@ -5,6 +5,7 @@ import SchedulerRepository from './scheduler.repository';
 import { MongoModule } from 'nest-mongodb';
 import Job from './models/job.model';
 import ActionsModule from '../actions/actions.module';
+import { SchedulerController } from './scheduler.controller';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import ActionsModule from '../actions/actions.module';
     MongoModule.forFeature([Job.NAME]),
     forwardRef(() => ActionsModule),
   ],
+  controllers: [SchedulerController],
   providers: [SchedulerService, SchedulerRepository],
   exports: [SchedulerService],
 })

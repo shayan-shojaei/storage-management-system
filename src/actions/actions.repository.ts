@@ -82,9 +82,6 @@ export default class ActionsRepository {
 
   async storageExists(id: ObjectId) {
     const storage = await this.storage.findOne({ _id: id });
-    if (storage) {
-      return true;
-    }
-    return false;
+    return storage;
   }
 }

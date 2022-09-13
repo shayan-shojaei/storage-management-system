@@ -3,7 +3,6 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotFoundException,
   OnApplicationBootstrap,
 } from '@nestjs/common';
 import { ActionsService } from '../actions/actions.service';
@@ -11,9 +10,10 @@ import Job, { JobType } from './models/job.model';
 import SchedulerRepository from './scheduler.repository';
 import { isValidCron } from 'cron-validator';
 import { ObjectId } from 'mongodb';
-import { BatchData } from './models/batchJob.model';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { BatchData, BatchJobDTO } from './dto/batchJob.dto';
+import { UpdateBatchJobDTO } from './dto/updateBatchJob.dto';
 
 @Injectable()
 export class SchedulerService implements OnApplicationBootstrap {
@@ -23,6 +23,39 @@ export class SchedulerService implements OnApplicationBootstrap {
     @Inject(forwardRef(() => ActionsService))
     private readonly actions: ActionsService,
   ) {}
+
+  findAll() {
+    return this.jobs.findAll();
+  }
+
+  async findById(id: string) {
+    const jobId = new ObjectId(id);
+    return this.jobs.exists(jobId);
+  }
+
+  async create(createDto: BatchJobDTO) {
+    const job = await this.createJob(
+      createDto.type,
+      createDto.cron,
+      createDto.data,
+    );
+    return job;
+  }
+
+  async delete(id: string) {
+    return this.deleteJob(id);
+  }
+
+  async update(id: string, body: UpdateBatchJobDTO) {
+    const jobId = new ObjectId(id);
+    const newJob = await this.jobs.update(jobId, body);
+
+    // restart job
+    this.stopJob(id);
+    this.setupJob(newJob);
+
+    return newJob;
+  }
 
   async onApplicationBootstrap() {
     // start all scheduled cron jobs from database
@@ -35,7 +68,7 @@ export class SchedulerService implements OnApplicationBootstrap {
     console.log('All jobs were scheduled.');
   }
 
-  async createJob(type: JobType, cron: string, data: any) {
+  async createJob(type: JobType, cron: string, data: BatchData) {
     // check cron string validity
     if (!isValidCron(cron, { seconds: true })) {
       throw new BadRequestException(
@@ -56,19 +89,21 @@ export class SchedulerService implements OnApplicationBootstrap {
   async deleteJob(id: string) {
     // delete from database
     const jobId = new ObjectId(id);
-    if (!this.jobs.jobExists(jobId)) {
-      throw new NotFoundException(`Job with id ${id} was not found.`);
-    }
+    await this.jobs.exists(jobId);
     const success = await this.jobs.delete(jobId);
 
     // stop job
-    this.schedulerRegistry.getCronJob(id).stop();
-    this.schedulerRegistry.deleteCronJob(id);
+    this.stopJob(id);
 
     return success;
   }
 
-  private setupJob(job: Job<any>) {
+  private stopJob(id: string) {
+    this.schedulerRegistry.getCronJob(id).stop();
+    this.schedulerRegistry.deleteCronJob(id);
+  }
+
+  private setupJob(job: Job<BatchData>) {
     switch (job.type) {
       case 'BATCH_ADD':
         this.setupBatch(job);
@@ -78,11 +113,13 @@ export class SchedulerService implements OnApplicationBootstrap {
 
   private setupBatch(job: Job<BatchData>) {
     const cronJob = new CronJob(job.cron, async () => {
-      const { data: ingredients } = job.data;
-      await this.actions.addIngredientsBatch(
-        { ingredients },
-        job.data.storageId,
-      );
+      const jobId = job._id;
+      // get new job data
+      const {
+        data: { ingredients, storageId },
+      } = (await this.jobs.findById(jobId)) as Job<BatchData>;
+
+      await this.actions.addIngredientsBatch({ ingredients }, storageId);
     });
 
     this.schedulerRegistry.addCronJob(job._id.toString(), cronJob);

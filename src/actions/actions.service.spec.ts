@@ -7,7 +7,6 @@ import ActionsRepository from './actions.repository';
 import { ActionsService } from './actions.service';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
-import BatchScheduleDTO from './dto/schedule.dto';
 import { BatchData } from '../scheduler/models/batchJob.model';
 
 const ingredientDTO: AddDTO = {
@@ -18,15 +17,6 @@ const ingredientDTO: AddDTO = {
 
 const batchIngredientDTO: BatchDTO = {
   ingredients: [
-    { name: 'Ing1', amount: 200, unit: 'G' },
-    { name: 'Ing2', amount: 4, unit: 'KG' },
-    { name: 'Ing3', amount: 10, unit: 'L' },
-  ],
-};
-
-const scheduleIngredientDTO: BatchScheduleDTO = {
-  cron: '*/10 * * * * *',
-  data: [
     { name: 'Ing1', amount: 200, unit: 'G' },
     { name: 'Ing2', amount: 4, unit: 'KG' },
     { name: 'Ing3', amount: 10, unit: 'L' },
@@ -113,23 +103,5 @@ describe('ActionsService', () => {
         createdAt: expect.any(Date),
       })),
     );
-  });
-
-  it('should schedule the addition of ingredients to storage', async () => {
-    const job = await service.scheduleIngredientsBatch(
-      scheduleIngredientDTO,
-      storageId,
-    );
-    const reponse = {
-      _id: expect.any(ObjectId),
-      createdAt: expect.any(Date),
-      cron: scheduleIngredientDTO.cron,
-      type: 'BATCH_ADD',
-      data: {
-        data: scheduleIngredientDTO.data,
-        storageId,
-      },
-    } as Job<BatchData>;
-    expect(job).toStrictEqual(reponse);
   });
 });
