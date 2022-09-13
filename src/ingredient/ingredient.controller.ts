@@ -1,5 +1,6 @@
 import {
   Body,
+  CacheInterceptor,
   Controller,
   Get,
   Param,
@@ -28,6 +29,7 @@ import {
 import { createSchema } from '../utils/createSchema';
 
 @Controller('ingredient')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Ingredients')
 export default class IngredientController {
   constructor(private readonly ingredients: IngredientService) {}

@@ -1,5 +1,6 @@
 import {
   Body,
+  CacheInterceptor,
   Controller,
   Delete,
   Get,
@@ -28,6 +29,7 @@ import {
 import { createSchema } from '../utils/createSchema';
 
 @Controller('storage')
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Storage')
 export default class StorageController {
   constructor(private readonly storage: StorageService) {}

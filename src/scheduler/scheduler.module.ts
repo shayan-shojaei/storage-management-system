@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import SchedulerRepository from './scheduler.repository';
 import { MongoModule } from 'nest-mongodb';
 import Job from './models/job.model';
-import ActionsModule from 'src/actions/actions.module';
+import ActionsModule from '../actions/actions.module';
 
 @Module({
   imports: [
