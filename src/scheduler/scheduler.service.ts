@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ActionsService } from '../actions/actions.service';
 import Job, { JobType } from './models/job.model';
-import SchedulerRepistory from './scheduler.repository';
+import SchedulerRepository from './scheduler.repository';
 import { isValidCron } from 'cron-validator';
 import { ObjectId } from 'mongodb';
 import { BatchData } from './models/batchJob.model';
@@ -18,7 +18,7 @@ import { CronJob } from 'cron';
 @Injectable()
 export class SchedulerService implements OnApplicationBootstrap {
   constructor(
-    private readonly jobs: SchedulerRepistory,
+    private readonly jobs: SchedulerRepository,
     private readonly schedulerRegistry: SchedulerRegistry,
     @Inject(forwardRef(() => ActionsService))
     private readonly actions: ActionsService,

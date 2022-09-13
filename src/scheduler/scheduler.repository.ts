@@ -4,7 +4,7 @@ import { InjectCollection } from 'nest-mongodb';
 import Job from './models/job.model';
 
 @Injectable()
-export default class SchedulerRepistory {
+export default class SchedulerRepository {
   constructor(
     @InjectCollection(Job.NAME) private readonly jobs: Collection<Job<any>>,
   ) {}

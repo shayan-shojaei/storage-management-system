@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SchedulerService } from './scheduler.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import SchedulerRepistory from './scheduler.repository';
+import SchedulerRepository from './scheduler.repository';
 import { MongoModule } from 'nest-mongodb';
 import Job from './models/job.model';
 import ActionsModule from 'src/actions/actions.module';
@@ -12,7 +12,7 @@ import ActionsModule from 'src/actions/actions.module';
     MongoModule.forFeature([Job.NAME]),
     forwardRef(() => ActionsModule),
   ],
-  providers: [SchedulerService, SchedulerRepistory],
+  providers: [SchedulerService, SchedulerRepository],
   exports: [SchedulerService],
 })
 export class SchedulerModule {}
