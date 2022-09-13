@@ -20,6 +20,7 @@ import { ActionsService } from './actions.service';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
 import { ADD_BATCH_EXAMPLE, ADD_EXAMPLE } from './examples';
+import UseDTO from './dto/use.dto';
 
 @Controller('storage')
 @ApiTags('Actions')
@@ -56,6 +57,21 @@ export class ActionsController {
     @Body() body: BatchDTO,
   ) {
     const batch = await this.actions.addIngredientsBatch(body, storageId);
+    return { success: true, data: batch };
+  }
+
+  @Post('/:storageId/use')
+  @UseInterceptors(ErrorInterceptor)
+  @ApiBody({ type: UseDTO })
+  @ApiOkResponse({
+    description: 'Array of ingredients with updated amounts.',
+    schema: createSchema(ADD_BATCH_EXAMPLE),
+  })
+  @ApiNotFoundResponse()
+  @ApiOperation({ summary: 'Use batch of ingredients from storage' })
+  @HttpCode(HttpStatus.OK)
+  async useBatch(@Param('storageId') storageId: string, @Body() body: UseDTO) {
+    const batch = await this.actions.useIngredientsBatch(body, storageId);
     return { success: true, data: batch };
   }
 }

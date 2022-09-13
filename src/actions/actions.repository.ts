@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Collection, ObjectId } from 'mongodb';
 import { InjectCollection } from 'nest-mongodb';
 import { unitConverter } from '../utils/unitConverter';
@@ -6,6 +6,7 @@ import Ingredient from '../ingredient/ingredient.model';
 import Storage from '../storage/storage.model';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
+import UseDTO from './dto/use.dto';
 
 @Injectable()
 export default class ActionsRepository {
@@ -51,6 +52,85 @@ export default class ActionsRepository {
     // add each ingredient and map result to list
     return Promise.all(
       ingredients.map((ingredient) => this.addIngredient(ingredient, storage)),
+    );
+  }
+
+  async getIngredientsInStorage(storage: Storage) {
+    return this.ingredient
+      .find({
+        _id: {
+          $in: storage.ingredients,
+        },
+      })
+      .toArray();
+  }
+
+  async calculateUpdatedIngredients(batch: UseDTO, storage: Storage) {
+    // get ingredients in storage
+    const ingredients = await this.getIngredientsInStorage(storage);
+
+    const usedIngredients = [];
+
+    console.log(ingredients);
+
+    // check if all ingredients amounts are sufficient in storage
+    for (const ingredient of batch.ingredients) {
+      const ingredientInStorage = ingredients.find(
+        (ing) => ing.name === ingredient.name,
+      );
+
+      // Not in storage
+      if (!ingredientInStorage) {
+        throw new BadRequestException(
+          `Ingredient with name ${
+            ingredient.name
+          } is not available in storage ${storage._id.toString()}`,
+        );
+      }
+
+      // convert unit
+      ingredientInStorage.amount = unitConverter(
+        ingredientInStorage.amount,
+        ingredientInStorage.unit,
+        ingredient.unit,
+      );
+
+      // insufficient amount
+      if (ingredient.amount > ingredientInStorage.amount) {
+        throw new BadRequestException(
+          `Insufficient ${ingredient.name} in storage.`,
+        );
+      }
+
+      // update amounts
+      ingredientInStorage.amount -= ingredient.amount;
+      usedIngredients.push(ingredientInStorage);
+    }
+
+    console.log(usedIngredients);
+    return usedIngredients;
+  }
+
+  async updateIngredientsAmounts(ingredients: Ingredient[]) {
+    // update
+    await Promise.all(
+      ingredients.map((ingredient) =>
+        this.ingredient.updateOne(
+          { _id: ingredient._id },
+          {
+            $set: {
+              amount: ingredient.amount,
+            },
+          },
+        ),
+      ),
+    );
+
+    // return updated values
+    return Promise.all(
+      ingredients.map((ingredient) =>
+        this.ingredient.findOne({ _id: ingredient._id }),
+      ),
     );
   }
 

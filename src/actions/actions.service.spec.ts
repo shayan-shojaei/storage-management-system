@@ -1,13 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
-import Job, { JobType } from '../scheduler/models/job.model';
-import { SchedulerService } from '../scheduler/scheduler.service';
+import Storage from 'src/storage/storage.model';
 import Ingredient from '../ingredient/ingredient.model';
 import ActionsRepository from './actions.repository';
 import { ActionsService } from './actions.service';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
-import { BatchData } from '../scheduler/models/batchJob.model';
+import UseDTO from './dto/use.dto';
 
 const ingredientDTO: AddDTO = {
   name: 'Ingredient Name',
@@ -15,7 +14,7 @@ const ingredientDTO: AddDTO = {
   unit: 'G',
 };
 
-const batchIngredientDTO: BatchDTO = {
+const batchIngredientDTO: BatchDTO | UseDTO = {
   ingredients: [
     { name: 'Ing1', amount: 200, unit: 'G' },
     { name: 'Ing2', amount: 4, unit: 'KG' },
@@ -46,21 +45,48 @@ describe('ActionsService', () => {
           storage,
         })),
     ),
-    storageExists: jest.fn().mockImplementation(async () => true),
-  };
-
-  const mockSchedulerService: Partial<SchedulerService> = {
-    createJob: jest.fn().mockImplementation(
-      (type: JobType, cron: string, data: any) =>
+    getIngredientsInStorage: jest.fn().mockImplementation(
+      async (storage: Storage): Promise<Ingredient[]> =>
+        storage.ingredients.map(
+          (ingredient) =>
+            ({
+              amount: 0,
+              name: '',
+              unit: 'G',
+              _id: new ObjectId(ingredient),
+              createdAt: new Date(),
+              storage: new ObjectId(storage._id),
+            } as Ingredient),
+        ),
+    ),
+    calculateUpdatedIngredients: jest.fn().mockImplementation(
+      async (batch: UseDTO, storage: Storage): Promise<Ingredient[]> =>
+        batch.ingredients.map(
+          (ingredient) =>
+            ({
+              ...ingredient,
+              _id: new ObjectId(),
+              createdAt: new Date(),
+              storage: storage._id,
+            } as Ingredient),
+        ),
+    ),
+    updateIngredientsAmounts: jest
+      .fn()
+      .mockImplementation(
+        async (ingredients: Ingredient[]): Promise<Ingredient[]> => ingredients,
+      ),
+    storageExists: jest.fn().mockImplementation(
+      async (id: ObjectId): Promise<Storage> =>
         ({
-          type,
-          cron,
-          data,
-          _id: new ObjectId(),
+          _id: id,
           createdAt: new Date(),
-        } as Job<BatchData>),
+          ingredients: [],
+          name: '',
+        } as Storage),
     ),
   };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -68,10 +94,6 @@ describe('ActionsService', () => {
         {
           provide: ActionsRepository,
           useValue: actionsRepoMock,
-        },
-        {
-          provide: SchedulerService,
-          useValue: mockSchedulerService,
         },
       ],
     }).compile();
@@ -102,6 +124,22 @@ describe('ActionsService', () => {
         storage: new ObjectId(storageId),
         createdAt: expect.any(Date),
       })),
+    );
+  });
+
+  it('should remove a batch of ingredients from storage', async () => {
+    expect(
+      await service.useIngredientsBatch(batchIngredientDTO, storageId),
+    ).toEqual(
+      batchIngredientDTO.ingredients.map(
+        (ingredient) =>
+          ({
+            ...ingredient,
+            _id: expect.any(ObjectId),
+            storage: new ObjectId(storageId),
+            createdAt: expect.any(Date),
+          } as Ingredient),
+      ),
     );
   });
 });

@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import { unitConverter } from 'src/utils/unitConverter';
 import ActionsRepository from './actions.repository';
 import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
@@ -20,12 +25,25 @@ export class ActionsService {
     return this.repository.addBatchIngredient(batch, storageId);
   }
 
-  async checkStorage(storage: ObjectId) {
-    const exists = await this.repository.storageExists(storage);
-    if (!exists) {
+  async useIngredientsBatch(batch: BatchDTO, storageId: string) {
+    const id = new ObjectId(storageId);
+    const storage = await this.checkStorage(id);
+
+    // calculate new amounts after reduction
+    const updatedIngredients =
+      await this.repository.calculateUpdatedIngredients(batch, storage);
+
+    // update ingredients with new values
+    return this.repository.updateIngredientsAmounts(updatedIngredients);
+  }
+
+  async checkStorage(id: ObjectId) {
+    const storage = await this.repository.storageExists(id);
+    if (!storage) {
       throw new NotFoundException(
-        `Storage with id ${storage.toString()} was not found.`,
+        `Storage with id ${id.toString()} was not found.`,
       );
     }
+    return storage;
   }
 }
