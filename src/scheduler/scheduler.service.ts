@@ -32,6 +32,7 @@ export class SchedulerService implements OnApplicationBootstrap {
     for (const job of jobs) {
       this.setupJob(job);
     }
+    console.log('All jobs were scheduled.');
   }
 
   async createJob(type: JobType, cron: string, data: any) {

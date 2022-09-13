@@ -27,6 +27,7 @@ import {
   SingleStorageExample,
 } from './examples';
 import { createSchema } from '../utils/createSchema';
+import { SingleIngredientExample } from '../ingredient/examples';
 
 @Controller('storage')
 @UseInterceptors(CacheInterceptor)
@@ -98,5 +99,24 @@ export default class StorageController {
   async deleteStorage(@Param('id') id: string) {
     await this.storage.deleteStorage(id);
     return { success: true };
+  }
+
+  @Get('/:id/:ingredient')
+  @UseInterceptors(ErrorInterceptor)
+  @ApiOkResponse({
+    description: 'Ingredient data in storage',
+    schema: createSchema(SingleIngredientExample),
+  })
+  @ApiNotFoundResponse()
+  @ApiOperation({ summary: 'Get ingredient in storage by name.' })
+  async getIngredientInStorage(
+    @Param('id') id: string,
+    @Param('ingredient') ingredientName: string,
+  ) {
+    const ingredient = await this.storage.getIngredientByName(
+      id,
+      ingredientName,
+    );
+    return { success: true, data: ingredient };
   }
 }

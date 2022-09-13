@@ -1,47 +1,35 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Collection, ObjectId } from 'mongodb';
-import { InjectCollection } from 'nest-mongodb';
+import { ObjectId } from 'mongodb';
 import { unitConverter } from '../utils/unitConverter';
 import UpdateIngredientDTO from './dto/updateIngredient.dto';
 import UpdateIngredientByNameDTO from './dto/updateIngredientByName.dto';
-import Ingredient from './ingredient.model';
+import IngredientRepository from './ingredient.repository';
 
 @Injectable()
 export default class IngredientService {
-  constructor(
-    @InjectCollection(Ingredient.NAME)
-    private readonly ingredient: Collection<Ingredient>,
-  ) {}
+  constructor(private readonly ingredients: IngredientRepository) {}
 
   async getAllIngredients() {
-    return this.ingredient.find().toArray();
+    return this.ingredients.findAll();
   }
 
   async getIngredientById(id: string) {
     const objectId = new ObjectId(id);
-    const ingredient = await this.ingredientExists(objectId);
-    return ingredient;
+    const ingredients = await this.ingredients.exists(objectId);
+    return ingredients;
   }
 
   async getIngredientsByName(name: string) {
-    const ingredients = await this.ingredient.find({ name }).toArray();
-    return ingredients;
+    return this.ingredients.findByName(name);
   }
 
   async updateIngredientById(id: string, update: UpdateIngredientDTO) {
     const objectId = new ObjectId(id);
-    update.storage = new ObjectId(update.storage);
-    await this.ingredientExists(objectId);
+    update.storage = new ObjectId(update.storage); // convert string to objectId
 
-    // Update
-    await this.ingredient.updateOne(
-      { _id: objectId },
-      {
-        $set: { ...update },
-      },
-    );
+    await this.ingredients.exists(objectId);
 
-    return this.ingredient.findOne({ _id: objectId });
+    return this.ingredients.update(objectId, update);
   }
 
   async updateIngredientByName(
@@ -49,26 +37,16 @@ export default class IngredientService {
     update: UpdateIngredientByNameDTO,
   ) {
     // Check if any ingredients with given name exist
-    const numOfIngredients = await this.ingredient.countDocuments({ name });
-    if (numOfIngredients === 0) {
+    if (!(await this.ingredients.nameExists(name))) {
       throw new NotFoundException(`No ingredients found with name ${name}`);
     }
 
-    // Update
-    await this.ingredient.updateMany(
-      { name },
-      {
-        $set: { ...update },
-      },
-    );
-
-    const newName = update.name !== undefined ? update.name : name;
-    return this.ingredient.find({ name: newName }).toArray();
+    return this.ingredients.updateByName(name, update);
   }
 
   async getTotalIngredientData(name: string) {
     // get all ingredients by name
-    const ingredients = await this.ingredient.find({ name }).toArray();
+    const ingredients = await this.ingredients.findByName(name);
     if (ingredients.length === 0) {
       throw new NotFoundException(
         `No ingredients were found with name ${name}`,
@@ -80,6 +58,8 @@ export default class IngredientService {
       if (prev === undefined) {
         return { ...current };
       }
+
+      // convert amounts to single unit
       return {
         ...prev,
         amount:
@@ -87,27 +67,11 @@ export default class IngredientService {
       };
     }, undefined);
 
+    // remove non-shared fields
     total._id = undefined;
     total.storage = undefined;
     total.createdAt = undefined;
 
     return total;
-  }
-
-  /**
-   * Checks whether ingredient with given id exists or not.
-   * @param {ObjectId} objectId Ingredient ObjectId
-   * @returns {Promise<Ingredient>} returns the ingredient if it exists
-   */
-  private async ingredientExists(objectId: ObjectId) {
-    const ingredient = await this.ingredient.findOne({ _id: objectId });
-
-    // Check if ingredient exists
-    if (!ingredient)
-      throw new NotFoundException(
-        `Ingredient with id ${objectId.toString()} was not found.`,
-      );
-
-    return ingredient;
   }
 }

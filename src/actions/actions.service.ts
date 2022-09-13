@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
-import { BatchData } from 'src/scheduler/models/batchJob.model';
+import { BatchData } from '../scheduler/models/batchJob.model';
 import { SchedulerService } from '../scheduler/scheduler.service';
 import ActionsRepository from './actions.repository';
 import AddDTO from './dto/add.dto';

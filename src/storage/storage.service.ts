@@ -1,69 +1,58 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Collection, ObjectId } from 'mongodb';
-import { InjectCollection } from 'nest-mongodb';
+import { ObjectId } from 'mongodb';
+import IngredientRepository from 'src/ingredient/ingredient.repository';
 import CreateStorageDTO from './dto/createStorage.dto';
 import UpdateStorageDTO from './dto/updateStorage.dto';
-import Storage from './storage.model';
+import StorageRepository from './storage.repository';
 
 @Injectable()
 export default class StorageService {
   constructor(
-    @InjectCollection(Storage.NAME)
-    private readonly storages: Collection<Storage>,
+    private readonly storages: StorageRepository,
+    private readonly ingredients: IngredientRepository,
   ) {}
 
   async getAllStorages() {
-    return this.storages.find().toArray();
+    return this.storages.findAll();
   }
 
   async getStorageById(id: string) {
     const objectId = new ObjectId(id);
 
-    const storage = this.storageExists(objectId);
+    const storage = await this.storages.exists(objectId);
     return storage;
   }
 
+  async getIngredientByName(id: string, ingredientName: string) {
+    const objectId = new ObjectId(id);
+    await this.storages.exists(objectId);
+
+    const ingredient = await this.ingredients.findInStorage(
+      objectId,
+      ingredientName,
+    );
+
+    if (ingredient) return ingredient;
+
+    throw new NotFoundException(
+      `Ingredient with name ${ingredientName} was not found in storage ${id}`,
+    );
+  }
+
   async createStorage(storageDto: CreateStorageDTO) {
-    const storage = new Storage(storageDto.name);
-    const { insertedId } = await this.storages.insertOne(storage);
-    return this.storages.findOne({ _id: insertedId });
+    return this.storages.create(storageDto);
   }
 
   async updateStorage(id: string, storageDto: UpdateStorageDTO) {
     const objectId = new ObjectId(id);
-    await this.storageExists(objectId);
+    await this.storages.exists(objectId);
 
-    // Update
-    await this.storages.updateOne(
-      { _id: objectId },
-      {
-        $set: { ...storageDto },
-      },
-    );
-
-    return this.storages.findOne({ _id: objectId });
+    return this.storages.update(objectId, storageDto);
   }
 
   async deleteStorage(id: string) {
     const objectId = new ObjectId(id);
-    await this.storageExists(objectId);
-    return this.storages.deleteOne({ _id: objectId });
-  }
-
-  /**
-   * Checks whether storage with given id exists or not.
-   * @param {ObjectId} objectId Storage ObjectId
-   * @returns {Promise<Storage>} returns the storage if it exists
-   */
-  private async storageExists(objectId: ObjectId) {
-    const storage = await this.storages.findOne({ _id: objectId });
-
-    // Check if storage exists
-    if (!storage)
-      throw new NotFoundException(
-        `Storage with id ${objectId.toString()} was not found.`,
-      );
-
-    return storage;
+    await this.storages.exists(objectId);
+    return this.storages.delete(objectId);
   }
 }
