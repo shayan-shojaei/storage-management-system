@@ -71,8 +71,6 @@ export default class ActionsRepository {
 
     const usedIngredients = [];
 
-    console.log(ingredients);
-
     // check if all ingredients amounts are sufficient in storage
     for (const ingredient of batch.ingredients) {
       const ingredientInStorage = ingredients.find(
@@ -107,7 +105,6 @@ export default class ActionsRepository {
       usedIngredients.push(ingredientInStorage);
     }
 
-    console.log(usedIngredients);
     return usedIngredients;
   }
 

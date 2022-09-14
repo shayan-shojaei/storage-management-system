@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 import Ingredient from '../ingredient/ingredient.model';
 
@@ -7,9 +8,13 @@ import Ingredient from '../ingredient/ingredient.model';
 export default class Storage {
   static readonly NAME = 'storage';
 
+  @Type(() => String)
   _id: ObjectId;
   name: string;
+
+  @Type(() => String)
   ingredients: ObjectId[]; // Reference to Ingredients
+
   createdAt: Date;
 
   /**
@@ -23,9 +28,12 @@ export default class Storage {
 }
 
 export class PopulatedStorage implements Omit<Storage, 'ingredients'> {
+  @Type(() => String)
   _id: ObjectId;
   name: string;
   createdAt: Date;
+
+  @Type(() => Ingredient)
   ingredients: Ingredient[];
 
   constructor(storage: Storage, ingredients: Ingredient[] = []) {

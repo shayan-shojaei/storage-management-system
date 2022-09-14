@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 
 export const JOB_TYPES = ['BATCH_ADD'] as const;
@@ -6,6 +7,7 @@ export type JobType = typeof JOB_TYPES[number];
 export default class Job<JobData> {
   static readonly NAME = 'jobs';
 
+  @Type(() => String)
   _id: ObjectId;
   type: JobType;
   data: JobData;

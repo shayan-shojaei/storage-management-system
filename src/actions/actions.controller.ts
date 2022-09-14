@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   HttpCode,
   HttpStatus,
@@ -24,6 +25,7 @@ import UseDTO from './dto/use.dto';
 import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('storage')
+@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(ErrorInterceptor)
 @UseInterceptors(ResultTransformer)
 @ApiTags('Actions')

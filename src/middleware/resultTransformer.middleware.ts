@@ -1,9 +1,10 @@
 import {
   CallHandler,
   ExecutionContext,
-  Injectable,
   NestInterceptor,
+  Type,
 } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { map, Observable } from 'rxjs';
 
 export interface Response<T> {
@@ -12,8 +13,7 @@ export interface Response<T> {
   count?: number;
 }
 
-@Injectable()
-export default class ResultTransformer<T>
+export default class ResultTransformerClass<T>
   implements NestInterceptor<T, Response<T>>
 {
   intercept(
@@ -22,7 +22,11 @@ export default class ResultTransformer<T>
   ): Observable<any> | Promise<Observable<Response<T>>> {
     return next.handle().pipe(
       map((data: T) => {
-        const response = { success: true, count: undefined, data };
+        const response = {
+          success: true,
+          count: undefined,
+          data,
+        };
         if (Array.isArray(data)) {
           response.count = data.length;
         }

@@ -1,8 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
-import ResultTransformer, {
-  Response,
-} from '../middleware/resultTransformer.middleware';
 import Ingredient from '../ingredient/ingredient.model';
 import { ActionsController } from './actions.controller';
 import { ActionsService } from './actions.service';
@@ -75,10 +72,7 @@ describe('ActionsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActionsController],
       providers: [{ provide: ActionsService, useValue: mockActionsService }],
-    })
-      // .overrideInterceptor(ResultTransformer)
-      // .useClass(ResultTransformer)
-      .compile();
+    }).compile();
 
     controller = module.get<ActionsController>(ActionsController);
   });

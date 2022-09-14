@@ -1,6 +1,7 @@
 import {
   Body,
   CacheInterceptor,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -34,9 +35,10 @@ import ResultTransformer from '../middleware/resultTransformer.middleware';
 import PopulateQuery from '../middleware/populateQuery.middleware';
 
 @Controller('storage')
-@UseInterceptors(CacheInterceptor)
+@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(ResultTransformer)
 @UseInterceptors(ErrorInterceptor)
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Storage')
 export default class StorageController {
   constructor(private readonly storage: StorageService) {}

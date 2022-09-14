@@ -1,6 +1,7 @@
 import {
   Body,
   CacheInterceptor,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -25,9 +26,10 @@ import { SchedulerService } from './scheduler.service';
 import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('scheduler')
-@UseInterceptors(CacheInterceptor)
-@UseInterceptors(ErrorInterceptor)
+@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(ResultTransformer)
+@UseInterceptors(ErrorInterceptor)
+@UseInterceptors(CacheInterceptor)
 @ApiTags('Scheduler')
 export class SchedulerController {
   constructor(private readonly scheduler: SchedulerService) {}

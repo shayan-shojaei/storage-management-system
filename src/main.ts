@@ -18,7 +18,7 @@ async function bootstrap() {
   app.use(mongoSanitize());
 
   // Validation Pipe
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   // Swagger
   const options = new DocumentBuilder()

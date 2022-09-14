@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
 import Storage from '../storage/storage.model';
 
@@ -19,10 +20,15 @@ export type Unit = typeof UNITS[number];
 export default class Ingredient {
   static readonly NAME = 'ingredient';
 
+  @Type(() => String)
   _id: ObjectId;
+
   name: string;
+
   unit: Unit;
   amount: number;
+
+  @Type(() => String)
   storage: ObjectId; // Reference to the storage
   createdAt: Date;
 
@@ -38,7 +44,9 @@ export default class Ingredient {
 }
 
 export class PopulatedIngredient implements Omit<Ingredient, 'storage'> {
+  @Type(() => String)
   _id: ObjectId;
+
   amount: number;
   createdAt: Date;
   name: string;
