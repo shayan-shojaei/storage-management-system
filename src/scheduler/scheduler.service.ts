@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   forwardRef,
   Inject,
@@ -92,10 +93,15 @@ export class SchedulerService implements OnApplicationBootstrap {
     await this.jobs.exists(jobId);
     const success = await this.jobs.delete(jobId);
 
+    if (!success) {
+      throw new BadGatewayException(`Failed to delete job with id ${id}`);
+    }
+
     // stop job
     this.stopJob(id);
 
-    return success;
+    // successful deletion
+    return {};
   }
 
   private stopJob(id: string) {

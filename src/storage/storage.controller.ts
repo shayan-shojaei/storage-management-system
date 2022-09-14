@@ -28,9 +28,12 @@ import {
 } from './examples';
 import { createSchema } from '../utils/createSchema';
 import { SingleIngredientExample } from '../ingredient/examples';
+import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('storage')
 @UseInterceptors(CacheInterceptor)
+@UseInterceptors(ResultTransformer)
+@UseInterceptors(ErrorInterceptor)
 @ApiTags('Storage')
 export default class StorageController {
   constructor(private readonly storage: StorageService) {}
@@ -41,22 +44,19 @@ export default class StorageController {
     schema: createSchema(AllStoragesExample),
   })
   @ApiOperation({ summary: 'Get all storages' })
-  async getAllStorages() {
-    const storages = await this.storage.getAllStorages();
-    return { succes: true, count: storages.length, data: storages };
+  getAllStorages() {
+    return this.storage.getAllStorages();
   }
 
   @Get('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiOkResponse({
     description: 'Single storage data',
     schema: createSchema(SingleStorageExample),
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get storage data by id' })
-  async getStorageById(@Param('id') id: string) {
-    const storage = await this.storage.getStorageById(id);
-    return { success: true, data: storage };
+  getStorageById(@Param('id') id: string) {
+    return this.storage.getStorageById(id);
   }
 
   @Post()
@@ -66,14 +66,12 @@ export default class StorageController {
     schema: createSchema(SingleStorageExample),
   })
   @ApiOperation({ summary: 'Create new storage' })
-  async createStorage(@Body() storage: CreateStorageDTO) {
-    const newStorage = await this.storage.createStorage(storage);
-    return { success: true, data: newStorage };
+  createStorage(@Body() storage: CreateStorageDTO) {
+    return this.storage.createStorage(storage);
   }
 
   @Put('/:id')
   @ApiBody({ type: UpdateStorageDTO })
-  @UseInterceptors(ErrorInterceptor)
   @ApiCreatedResponse({
     description: 'Storage update',
     schema: createSchema(SingleStorageExample),
@@ -84,25 +82,21 @@ export default class StorageController {
     @Param('id') id: string,
     @Body() storage: UpdateStorageDTO,
   ) {
-    const newStorage = await this.storage.updateStorage(id, storage);
-    return { success: true, data: newStorage };
+    return this.storage.updateStorage(id, storage);
   }
 
   @Delete('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiCreatedResponse({
     description: 'Storage deletion',
     schema: createSchema(DeleteStorageExample),
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Delete storage by id' })
-  async deleteStorage(@Param('id') id: string) {
-    await this.storage.deleteStorage(id);
-    return { success: true };
+  deleteStorage(@Param('id') id: string) {
+    return this.storage.deleteStorage(id);
   }
 
   @Get('/:id/:ingredient')
-  @UseInterceptors(ErrorInterceptor)
   @ApiOkResponse({
     description: 'Ingredient data in storage',
     schema: createSchema(SingleIngredientExample),
@@ -113,10 +107,6 @@ export default class StorageController {
     @Param('id') id: string,
     @Param('ingredient') ingredientName: string,
   ) {
-    const ingredient = await this.storage.getIngredientByName(
-      id,
-      ingredientName,
-    );
-    return { success: true, data: ingredient };
+    return this.storage.getIngredientByName(id, ingredientName);
   }
 }

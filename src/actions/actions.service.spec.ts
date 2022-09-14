@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
-import Storage from 'src/storage/storage.model';
+import Storage from '../storage/storage.model';
 import Ingredient from '../ingredient/ingredient.model';
 import ActionsRepository from './actions.repository';
 import { ActionsService } from './actions.service';

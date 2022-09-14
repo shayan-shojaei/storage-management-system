@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
+import ResultTransformer, {
+  Response,
+} from '../middleware/resultTransformer.middleware';
 import Ingredient from '../ingredient/ingredient.model';
 import { ActionsController } from './actions.controller';
 import { ActionsService } from './actions.service';
@@ -72,7 +75,10 @@ describe('ActionsController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ActionsController],
       providers: [{ provide: ActionsService, useValue: mockActionsService }],
-    }).compile();
+    })
+      // .overrideInterceptor(ResultTransformer)
+      // .useClass(ResultTransformer)
+      .compile();
 
     controller = module.get<ActionsController>(ActionsController);
   });
@@ -85,8 +91,7 @@ describe('ActionsController', () => {
     it('should add ingredient', async () => {
       const response = await controller.add(STORAGE_1, ADD_INGREDIENT_1);
       expect(response).toBeDefined();
-      expect(response.success).toBe(true);
-      expect(response.data).toEqual({
+      expect(response).toEqual({
         ...ADD_INGREDIENT_1,
         _id: expect.any(ObjectId),
         storage: new ObjectId(STORAGE_1),
@@ -99,8 +104,7 @@ describe('ActionsController', () => {
     it('should add a batch of ingredients', async () => {
       const response = await controller.addBatch(STORAGE_1, BATCH_INGREDIENT);
       expect(response).toBeDefined();
-      expect(response.success).toBe(true);
-      expect(response.data).toEqual([
+      expect(response).toEqual([
         {
           ...ADD_INGREDIENT_1,
           _id: expect.any(ObjectId),
@@ -121,8 +125,7 @@ describe('ActionsController', () => {
     it('should use a batch of ingredients and update database with reduced amounts', async () => {
       const response = await controller.useBatch(STORAGE_1, BATCH_INGREDIENT);
       expect(response).toBeDefined();
-      expect(response.success).toBe(true);
-      expect(response.data).toEqual([
+      expect(response).toEqual([
         {
           ...ADD_INGREDIENT_1,
           _id: expect.any(ObjectId),

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadGatewayException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import IngredientRepository from '../ingredient/ingredient.repository';
 import CreateStorageDTO from './dto/createStorage.dto';
@@ -53,6 +57,12 @@ export default class StorageService {
   async deleteStorage(id: string) {
     const objectId = new ObjectId(id);
     await this.storages.exists(objectId);
-    return this.storages.delete(objectId);
+    const { deletedCount } = await this.storages.delete(objectId);
+    if (deletedCount === 1) {
+      // successful deletion
+      return {};
+    }
+
+    throw new BadGatewayException(`Failed to delete storage with id ${id}`);
   }
 }

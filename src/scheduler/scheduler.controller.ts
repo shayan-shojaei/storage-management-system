@@ -22,9 +22,12 @@ import { BatchJobDTO } from './dto/batchJob.dto';
 import { UpdateBatchJobDTO } from './dto/updateBatchJob.dto';
 import { ALL_EXAMPLE, DELETE_EXAMPLE, SINGLE_EXAMPLE } from './examples';
 import { SchedulerService } from './scheduler.service';
+import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('scheduler')
 @UseInterceptors(CacheInterceptor)
+@UseInterceptors(ErrorInterceptor)
+@UseInterceptors(ResultTransformer)
 @ApiTags('Scheduler')
 export class SchedulerController {
   constructor(private readonly scheduler: SchedulerService) {}
@@ -35,21 +38,18 @@ export class SchedulerController {
     schema: createSchema(ALL_EXAMPLE),
   })
   @ApiOperation({ summary: 'Get all scheduled jobs' })
-  async getAll() {
-    const jobs = await this.scheduler.findAll();
-    return { success: true, data: jobs };
+  getAll() {
+    return this.scheduler.findAll();
   }
 
   @Get('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiOkResponse({
     description: 'Job data.',
     schema: createSchema(SINGLE_EXAMPLE),
   })
   @ApiOperation({ summary: 'Get job data by id' })
-  async getById(@Param('id') id: string) {
-    const job = await this.scheduler.findById(id);
-    return { success: true, data: job };
+  getById(@Param('id') id: string) {
+    return this.scheduler.findById(id);
   }
 
   @Post()
@@ -61,9 +61,8 @@ export class SchedulerController {
     schema: createSchema(SINGLE_EXAMPLE),
   })
   @ApiOperation({ summary: 'Create and schedule a job' })
-  async create(@Body() body: BatchJobDTO) {
-    const job = await this.scheduler.create(body);
-    return { success: true, data: job };
+  create(@Body() body: BatchJobDTO) {
+    return this.scheduler.create(body);
   }
 
   @Delete('/:id')
@@ -73,13 +72,11 @@ export class SchedulerController {
     schema: createSchema(DELETE_EXAMPLE),
   })
   @ApiOperation({ summary: 'Delete a scheduled job' })
-  async delete(@Param('id') id: string) {
-    await this.scheduler.delete(id);
-    return { success: true };
+  delete(@Param('id') id: string) {
+    return this.scheduler.delete(id);
   }
 
   @Put('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({
     type: UpdateBatchJobDTO,
   })
@@ -88,8 +85,7 @@ export class SchedulerController {
     schema: createSchema(SINGLE_EXAMPLE),
   })
   @ApiOperation({ summary: 'Update a scheduled job' })
-  async update(@Param('id') id: string, @Body() body: UpdateBatchJobDTO) {
-    const job = await this.scheduler.update(id, body);
-    return { success: true, data: job };
+  update(@Param('id') id: string, @Body() body: UpdateBatchJobDTO) {
+    return this.scheduler.update(id, body);
   }
 }

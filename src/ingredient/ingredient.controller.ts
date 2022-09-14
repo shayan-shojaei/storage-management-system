@@ -27,9 +27,12 @@ import {
   TotalIngredientExample,
 } from './examples';
 import { createSchema } from '../utils/createSchema';
+import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('ingredient')
 @UseInterceptors(CacheInterceptor)
+@UseInterceptors(ResultTransformer)
+@UseInterceptors(ErrorInterceptor)
 @ApiTags('Ingredients')
 export default class IngredientController {
   constructor(private readonly ingredients: IngredientService) {}
@@ -52,20 +55,18 @@ export default class IngredientController {
     } else {
       ingredients = await this.ingredients.getIngredientsByName(name);
     }
-    return { succes: true, count: ingredients.length, data: ingredients };
+    return ingredients;
   }
 
   @Get('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiOkResponse({
     description: 'Single ingredient data',
     schema: createSchema(SingleIngredientExample),
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by id' })
-  async getIngredientById(@Param('id') id: string) {
-    const ingredient = await this.ingredients.getIngredientById(id);
-    return { success: true, data: ingredient };
+  getIngredientById(@Param('id') id: string) {
+    return this.ingredients.getIngredientById(id);
   }
 
   @Get('/:name/total')
@@ -75,13 +76,11 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by name across all storages' })
-  async getTotalIngredientData(@Param('name') name: string) {
-    const ingredient = await this.ingredients.getTotalIngredientData(name);
-    return { success: true, data: ingredient };
+  getTotalIngredientData(@Param('name') name: string) {
+    return this.ingredients.getTotalIngredientData(name);
   }
 
   @Put('/:id')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({ type: UpdateIngredientDTO })
   @ApiOkResponse({
     description: 'Updated ingredient data',
@@ -89,16 +88,14 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Update ingredient by id' })
-  async updateIngredientById(
+  updateIngredientById(
     @Param('id') id: string,
     @Body() body: UpdateIngredientDTO,
   ) {
-    const ingredient = await this.ingredients.updateIngredientById(id, body);
-    return { success: true, data: ingredient };
+    return this.ingredients.updateIngredientById(id, body);
   }
 
   @Put('/:name/all')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({ type: UpdateIngredientByNameDTO })
   @ApiOkResponse({
     description: 'Updated ingredients data',
@@ -106,14 +103,10 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Update ingredients by name' })
-  async updateIngredientByName(
+  updateIngredientByName(
     @Param('name') name: string,
     @Body() body: UpdateIngredientByNameDTO,
   ) {
-    const ingredients = await this.ingredients.updateIngredientByName(
-      name,
-      body,
-    );
-    return { success: true, count: ingredients.length, data: ingredients };
+    return this.ingredients.updateIngredientByName(name, body);
   }
 }

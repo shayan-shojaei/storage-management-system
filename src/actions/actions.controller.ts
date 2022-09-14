@@ -21,14 +21,16 @@ import AddDTO from './dto/add.dto';
 import BatchDTO from './dto/batch.dto';
 import { ADD_BATCH_EXAMPLE, ADD_EXAMPLE } from './examples';
 import UseDTO from './dto/use.dto';
+import ResultTransformer from '../middleware/resultTransformer.middleware';
 
 @Controller('storage')
+@UseInterceptors(ErrorInterceptor)
+@UseInterceptors(ResultTransformer)
 @ApiTags('Actions')
 export class ActionsController {
   constructor(private readonly actions: ActionsService) {}
 
   @Post('/:storageId/add')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({ type: AddDTO })
   @ApiOkResponse({
     description: 'Added ingredient with updated values.',
@@ -37,13 +39,11 @@ export class ActionsController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Add single ingredient to storage' })
   @HttpCode(HttpStatus.OK)
-  async add(@Param('storageId') storageId: string, @Body() body: AddDTO) {
-    const ingredient = await this.actions.addIngredient(body, storageId);
-    return { success: true, data: ingredient };
+  add(@Param('storageId') storageId: string, @Body() body: AddDTO) {
+    return this.actions.addIngredient(body, storageId);
   }
 
   @Post('/:storageId/batch')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({ type: BatchDTO })
   @ApiOkResponse({
     description: 'Array of added ingredients with updated values.',
@@ -56,12 +56,10 @@ export class ActionsController {
     @Param('storageId') storageId: string,
     @Body() body: BatchDTO,
   ) {
-    const batch = await this.actions.addIngredientsBatch(body, storageId);
-    return { success: true, data: batch };
+    return this.actions.addIngredientsBatch(body, storageId);
   }
 
   @Post('/:storageId/use')
-  @UseInterceptors(ErrorInterceptor)
   @ApiBody({ type: UseDTO })
   @ApiOkResponse({
     description: 'Array of ingredients with updated amounts.',
@@ -71,7 +69,6 @@ export class ActionsController {
   @ApiOperation({ summary: 'Use batch of ingredients from storage' })
   @HttpCode(HttpStatus.OK)
   async useBatch(@Param('storageId') storageId: string, @Body() body: UseDTO) {
-    const batch = await this.actions.useIngredientsBatch(body, storageId);
-    return { success: true, data: batch };
+    return this.actions.useIngredientsBatch(body, storageId);
   }
 }
