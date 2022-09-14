@@ -13,9 +13,7 @@ export default class Job<JobData> {
   createdAt: Date;
 
   constructor(type: JobType, data: JobData, cron: string) {
-    this.data = data;
-    this.cron = cron;
-    this.type = type;
+    Object.assign(this, { type, cron, data });
     this.createdAt = new Date();
   }
 }

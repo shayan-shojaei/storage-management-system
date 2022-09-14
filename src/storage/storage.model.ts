@@ -17,8 +17,7 @@ export default class Storage {
    * @param {ObjectId[]} ingredients List of ingredients in storage
    */
   constructor(name: string, ingredients: ObjectId[] = []) {
-    this.name = name;
-    this.ingredients = ingredients;
+    Object.assign(this, { name, ingredients });
     this.createdAt = new Date();
   }
 }
@@ -30,10 +29,6 @@ export class PopulatedStorage implements Omit<Storage, 'ingredients'> {
   ingredients: Ingredient[];
 
   constructor(storage: Storage, ingredients: Ingredient[] = []) {
-    this._id = storage._id;
-    this.name = storage.name;
-    this.createdAt = storage.createdAt;
-    this.name = storage.name;
-    this.ingredients = ingredients;
+    Object.assign(this, { ...storage, ingredients });
   }
 }

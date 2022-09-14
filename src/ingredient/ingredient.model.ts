@@ -32,10 +32,7 @@ export default class Ingredient {
    * @param {number} [amount=0] - Amount of ingredient
    */
   constructor(name: string, unit: Unit, storage: ObjectId, amount = 0) {
-    this.name = name;
-    this.unit = unit;
-    this.amount = amount;
-    this.storage = storage;
+    Object.assign(this, { name, unit, amount, storage });
     this.createdAt = new Date();
   }
 }
@@ -49,11 +46,6 @@ export class PopulatedIngredient implements Omit<Ingredient, 'storage'> {
   storage: Storage;
 
   constructor(ingredient: Ingredient, storage: Storage) {
-    this._id = ingredient._id;
-    this.amount = ingredient.amount;
-    this.createdAt = ingredient.createdAt;
-    this.name = ingredient.name;
-    this.unit = ingredient.unit;
-    this.storage = storage;
+    Object.assign(this, { ...ingredient, storage });
   }
 }
