@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Collection, ObjectId } from 'mongodb';
 import { InjectCollection } from 'nest-mongodb';
 import IngredientRepository from '../ingredient/ingredient.repository';
@@ -11,6 +16,7 @@ export default class StorageRepository {
   constructor(
     @InjectCollection(Storage.NAME)
     private readonly storages: Collection<Storage>,
+    @Inject(forwardRef(() => IngredientRepository))
     private readonly ingredients: IngredientRepository,
   ) {}
 

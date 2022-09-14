@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import Storage from '../storage/storage.model';
 
 export const UNITS = ['KG', 'G', 'L', 'ML', 'M', 'CM'] as const;
 /**
@@ -36,5 +37,23 @@ export default class Ingredient {
     this.amount = amount;
     this.storage = storage;
     this.createdAt = new Date();
+  }
+}
+
+export class PopulatedIngredient implements Omit<Ingredient, 'storage'> {
+  _id: ObjectId;
+  amount: number;
+  createdAt: Date;
+  name: string;
+  unit: 'KG' | 'G' | 'L' | 'ML' | 'M' | 'CM';
+  storage: Storage;
+
+  constructor(ingredient: Ingredient, storage: Storage) {
+    this._id = ingredient._id;
+    this.amount = ingredient.amount;
+    this.createdAt = ingredient.createdAt;
+    this.name = ingredient.name;
+    this.unit = ingredient.unit;
+    this.storage = storage;
   }
 }

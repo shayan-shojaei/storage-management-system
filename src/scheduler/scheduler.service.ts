@@ -11,7 +11,7 @@ import Job, { JobType } from './models/job.model';
 import SchedulerRepository from './scheduler.repository';
 import { isValidCron } from 'cron-validator';
 import { ObjectId } from 'mongodb';
-import { SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { BatchData, BatchJobDTO } from './dto/batchJob.dto';
 import { UpdateBatchJobDTO } from './dto/updateBatchJob.dto';

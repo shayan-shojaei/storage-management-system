@@ -18,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { ErrorInterceptor } from '../middleware/errorInterceptor.middleware';
 import IngredientService from './ingredient.service';
-import Ingredient from './ingredient.model';
+import Ingredient, { PopulatedIngredient } from './ingredient.model';
 import UpdateIngredientDTO from './dto/updateIngredient.dto';
 import UpdateIngredientByNameDTO from './dto/updateIngredientByName.dto';
 import {
@@ -28,6 +28,7 @@ import {
 } from './examples';
 import { createSchema } from '../utils/createSchema';
 import ResultTransformer from '../middleware/resultTransformer.middleware';
+import PopulateQuery from '../middleware/populateQuery.middleware';
 
 @Controller('ingredient')
 @UseInterceptors(CacheInterceptor)
@@ -38,6 +39,7 @@ export default class IngredientController {
   constructor(private readonly ingredients: IngredientService) {}
 
   @Get()
+  @UseInterceptors(PopulateQuery)
   @ApiOkResponse({
     description: 'List of all ingredients',
     schema: createSchema(AllIngredientsExample),
@@ -48,25 +50,39 @@ export default class IngredientController {
     description: 'Get ingredients by name (across all storages)',
     required: false,
   })
-  async getAllIngredients(@Query('name') name?: string) {
-    let ingredients: Ingredient[];
+  @ApiQuery({
+    name: 'fill',
+    enum: ['true', 'false'],
+    description: 'Populates the storage field if true is passed',
+  })
+  async getAllIngredients(
+    @Query('fill') fill?: boolean,
+    @Query('name') name?: string,
+  ) {
+    let ingredients: Ingredient[] | PopulatedIngredient[];
     if (!name) {
-      ingredients = await this.ingredients.getAllIngredients();
+      ingredients = await this.ingredients.getAllIngredients(fill);
     } else {
-      ingredients = await this.ingredients.getIngredientsByName(name);
+      ingredients = await this.ingredients.getIngredientsByName(name, fill);
     }
     return ingredients;
   }
 
   @Get('/:id')
+  @UseInterceptors(PopulateQuery)
   @ApiOkResponse({
     description: 'Single ingredient data',
     schema: createSchema(SingleIngredientExample),
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by id' })
-  getIngredientById(@Param('id') id: string) {
-    return this.ingredients.getIngredientById(id);
+  @ApiQuery({
+    name: 'fill',
+    enum: ['true', 'false'],
+    description: 'Populates the storage field if true is passed',
+  })
+  getIngredientById(@Param('id') id: string, @Query('fill') fill: boolean) {
+    return this.ingredients.getIngredientById(id, fill);
   }
 
   @Get('/:name/total')

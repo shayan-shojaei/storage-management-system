@@ -3,24 +3,25 @@ import { ObjectId } from 'mongodb';
 import { unitConverter } from '../utils/unitConverter';
 import UpdateIngredientDTO from './dto/updateIngredient.dto';
 import UpdateIngredientByNameDTO from './dto/updateIngredientByName.dto';
+import Ingredient from './ingredient.model';
 import IngredientRepository from './ingredient.repository';
 
 @Injectable()
 export default class IngredientService {
   constructor(private readonly ingredients: IngredientRepository) {}
 
-  async getAllIngredients() {
-    return this.ingredients.findAll();
+  getAllIngredients(fill = false) {
+    return this.ingredients.findAll(fill);
   }
 
-  async getIngredientById(id: string) {
+  async getIngredientById(id: string, fill = false) {
     const objectId = new ObjectId(id);
-    const ingredients = await this.ingredients.exists(objectId);
+    const ingredients = await this.ingredients.exists(objectId, fill);
     return ingredients;
   }
 
-  async getIngredientsByName(name: string) {
-    return this.ingredients.findByName(name);
+  async getIngredientsByName(name: string, fill = false) {
+    return this.ingredients.findByName(name, fill);
   }
 
   async updateIngredientById(id: string, update: UpdateIngredientDTO) {
@@ -46,7 +47,10 @@ export default class IngredientService {
 
   async getTotalIngredientData(name: string) {
     // get all ingredients by name
-    const ingredients = await this.ingredients.findByName(name);
+    const ingredients = (await this.ingredients.findByName(
+      name,
+    )) as Ingredient[];
+
     if (ingredients.length === 0) {
       throw new NotFoundException(
         `No ingredients were found with name ${name}`,

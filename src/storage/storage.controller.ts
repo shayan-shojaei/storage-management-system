@@ -31,7 +31,7 @@ import {
 import { createSchema } from '../utils/createSchema';
 import { SingleIngredientExample } from '../ingredient/examples';
 import ResultTransformer from '../middleware/resultTransformer.middleware';
-import PopulateQuery from 'src/middleware/populateQuery.middleware';
+import PopulateQuery from '../middleware/populateQuery.middleware';
 
 @Controller('storage')
 @UseInterceptors(CacheInterceptor)
@@ -48,6 +48,7 @@ export default class StorageController {
   })
   @ApiOperation({ summary: 'Get all storages' })
   @ApiQuery({
+    name: 'fill',
     enum: ['true', 'false'],
     description: 'Populates the ingredients field if true is passed',
   })
@@ -64,6 +65,7 @@ export default class StorageController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get storage data by id' })
   @ApiQuery({
+    name: 'fill',
     enum: ['true', 'false'],
     description: 'Populates the ingredients field if true is passed',
   })
