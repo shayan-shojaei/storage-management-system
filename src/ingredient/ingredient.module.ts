@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { MongoModule } from 'nest-mongodb';
-import StorageModule from 'src/storage/storage.module';
+import StorageModule from '../storage/storage.module';
 import IngredientController from './ingredient.controller';
 import Ingredient from './ingredient.model';
 import IngredientRepository from './ingredient.repository';

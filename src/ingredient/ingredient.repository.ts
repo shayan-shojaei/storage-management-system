@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Collection, ObjectId } from 'mongodb';
 import { InjectCollection } from 'nest-mongodb';
-import Storage from 'src/storage/storage.model';
+import Storage from '../storage/storage.model';
 import StorageRepository from '../storage/storage.repository';
 import UpdateIngredientDTO from './dto/updateIngredient.dto';
 import UpdateIngredientByNameDTO from './dto/updateIngredientByName.dto';
