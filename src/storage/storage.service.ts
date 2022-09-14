@@ -16,14 +16,14 @@ export default class StorageService {
     private readonly ingredients: IngredientRepository,
   ) {}
 
-  async getAllStorages() {
-    return this.storages.findAll();
+  async getAllStorages(fill = false) {
+    return this.storages.findAll(fill);
   }
 
-  async getStorageById(id: string) {
+  async getStorageById(id: string, fill = false) {
     const objectId = new ObjectId(id);
 
-    const storage = await this.storages.exists(objectId);
+    const storage = await this.storages.exists(objectId, fill);
     return storage;
   }
 

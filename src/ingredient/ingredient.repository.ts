@@ -16,6 +16,10 @@ export default class IngredientRepository {
     return this.ingredient.find().toArray();
   }
 
+  findById(id: ObjectId) {
+    return this.ingredient.findOne({ _id: id });
+  }
+
   findByName(name: string) {
     return this.ingredient.find({ name }).toArray();
   }

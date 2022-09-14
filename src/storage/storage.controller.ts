@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import CreateStorageDTO from './dto/createStorage.dto';
@@ -17,6 +18,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import UpdateStorageDTO from './dto/updateStorage.dto';
@@ -29,6 +31,7 @@ import {
 import { createSchema } from '../utils/createSchema';
 import { SingleIngredientExample } from '../ingredient/examples';
 import ResultTransformer from '../middleware/resultTransformer.middleware';
+import PopulateQuery from 'src/middleware/populateQuery.middleware';
 
 @Controller('storage')
 @UseInterceptors(CacheInterceptor)
@@ -44,8 +47,13 @@ export default class StorageController {
     schema: createSchema(AllStoragesExample),
   })
   @ApiOperation({ summary: 'Get all storages' })
-  getAllStorages() {
-    return this.storage.getAllStorages();
+  @ApiQuery({
+    enum: ['true', 'false'],
+    description: 'Populates the ingredients field if true is passed',
+  })
+  @UseInterceptors(PopulateQuery)
+  getAllStorages(@Query('fill') fill: boolean) {
+    return this.storage.getAllStorages(fill);
   }
 
   @Get('/:id')
@@ -55,8 +63,13 @@ export default class StorageController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get storage data by id' })
-  getStorageById(@Param('id') id: string) {
-    return this.storage.getStorageById(id);
+  @ApiQuery({
+    enum: ['true', 'false'],
+    description: 'Populates the ingredients field if true is passed',
+  })
+  @UseInterceptors(PopulateQuery)
+  getStorageById(@Param('id') id: string, @Query('fill') fill: boolean) {
+    return this.storage.getStorageById(id, fill);
   }
 
   @Post()

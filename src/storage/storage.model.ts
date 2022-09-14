@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import Ingredient from '../ingredient/ingredient.model';
 
 /**
  * **Storage Model**
@@ -19,5 +20,20 @@ export default class Storage {
     this.name = name;
     this.ingredients = ingredients;
     this.createdAt = new Date();
+  }
+}
+
+export class PopulatedStorage implements Omit<Storage, 'ingredients'> {
+  _id: ObjectId;
+  name: string;
+  createdAt: Date;
+  ingredients: Ingredient[];
+
+  constructor(storage: Storage, ingredients: Ingredient[] = []) {
+    this._id = storage._id;
+    this.name = storage.name;
+    this.createdAt = storage.createdAt;
+    this.name = storage.name;
+    this.ingredients = ingredients;
   }
 }
