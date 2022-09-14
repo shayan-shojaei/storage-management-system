@@ -12,7 +12,7 @@ export const SINGLE_EXAMPLE = {
         },
       ],
     },
-    cron: '0/1 * * * * *',
+    cron: '*/1 * * * * *',
     type: 'BATCH_ADD',
     createdAt: '2022-09-13T08:31:10.955Z',
   },
