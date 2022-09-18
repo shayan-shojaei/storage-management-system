@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { ObjectId } from 'mongodb';
+import { TransformObjectId } from '../middleware/objectId.transformer';
 import Storage from '../storage/storage.model';
 
 export const UNITS = ['KG', 'G', 'L', 'ML', 'M', 'CM'] as const;
@@ -20,7 +21,7 @@ export type Unit = typeof UNITS[number];
 export default class Ingredient {
   static readonly NAME = 'ingredient';
 
-  @Type(() => String)
+  @TransformObjectId()
   _id: ObjectId;
 
   name: string;

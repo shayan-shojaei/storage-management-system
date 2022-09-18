@@ -1,13 +1,11 @@
 import {
   Body,
   CacheInterceptor,
-  ClassSerializerInterceptor,
   Controller,
   Get,
   Param,
   Put,
   Query,
-  SerializeOptions,
   UseInterceptors,
 } from '@nestjs/common';
 import {
@@ -30,12 +28,11 @@ import {
 } from './examples';
 import { createSchema } from '../utils/createSchema';
 import PopulateQuery from '../middleware/populateQuery.middleware';
-import ResultTransformer from '../middleware/resultTransformer.middleware';
+import ResultTransformer from '../middleware/resultTransformer.transformer';
 
 @Controller('ingredient')
-@UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(ResultTransformer)
 @UseInterceptors(ErrorInterceptor)
+@UseInterceptors(ResultTransformer)
 @UseInterceptors(CacheInterceptor)
 @ApiTags('Ingredients')
 export default class IngredientController {
@@ -61,7 +58,7 @@ export default class IngredientController {
   async getAllIngredients(
     @Query('fill') fill?: boolean,
     @Query('name') name?: string,
-  ): Promise<Ingredient[] | PopulatedIngredient[]> {
+  ) {
     let ingredients: Ingredient[] | PopulatedIngredient[];
     if (!name) {
       ingredients = await this.ingredients.getAllIngredients(fill);

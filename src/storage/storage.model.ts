@@ -1,4 +1,5 @@
 import { Type } from 'class-transformer';
+import { IsArray } from 'class-validator';
 import { ObjectId } from 'mongodb';
 import Ingredient from '../ingredient/ingredient.model';
 
@@ -10,9 +11,11 @@ export default class Storage {
 
   @Type(() => String)
   _id: ObjectId;
+
   name: string;
 
   @Type(() => String)
+  @IsArray()
   ingredients: ObjectId[]; // Reference to Ingredients
 
   createdAt: Date;
@@ -30,10 +33,12 @@ export default class Storage {
 export class PopulatedStorage implements Omit<Storage, 'ingredients'> {
   @Type(() => String)
   _id: ObjectId;
+
   name: string;
   createdAt: Date;
 
   @Type(() => Ingredient)
+  @IsArray()
   ingredients: Ingredient[];
 
   constructor(storage: Storage, ingredients: Ingredient[] = []) {

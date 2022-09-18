@@ -1,7 +1,6 @@
 import {
   Body,
   CacheInterceptor,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -31,13 +30,12 @@ import {
 } from './examples';
 import { createSchema } from '../utils/createSchema';
 import { SingleIngredientExample } from '../ingredient/examples';
-import ResultTransformer from '../middleware/resultTransformer.middleware';
+import ResultTransformer from '../middleware/resultTransformer.transformer';
 import PopulateQuery from '../middleware/populateQuery.middleware';
 
 @Controller('storage')
-@UseInterceptors(ClassSerializerInterceptor)
-@UseInterceptors(ResultTransformer)
 @UseInterceptors(ErrorInterceptor)
+@UseInterceptors(ResultTransformer)
 @UseInterceptors(CacheInterceptor)
 @ApiTags('Storage')
 export default class StorageController {

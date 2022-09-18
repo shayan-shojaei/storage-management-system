@@ -1,7 +1,6 @@
 import {
   Body,
   CacheInterceptor,
-  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -23,10 +22,9 @@ import { BatchJobDTO } from './dto/batchJob.dto';
 import { UpdateBatchJobDTO } from './dto/updateBatchJob.dto';
 import { ALL_EXAMPLE, DELETE_EXAMPLE, SINGLE_EXAMPLE } from './examples';
 import { SchedulerService } from './scheduler.service';
-import ResultTransformer from '../middleware/resultTransformer.middleware';
+import ResultTransformer from '../middleware/resultTransformer.transformer';
 
 @Controller('scheduler')
-@UseInterceptors(ClassSerializerInterceptor)
 @UseInterceptors(ResultTransformer)
 @UseInterceptors(ErrorInterceptor)
 @UseInterceptors(CacheInterceptor)
