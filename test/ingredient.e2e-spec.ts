@@ -54,25 +54,11 @@ describe('/ingredient', () => {
     nameExists: jest.fn().mockResolvedValue(true),
     updateByName: jest.fn().mockResolvedValue([INGREDIENT]),
   };
-  const mockIngredientService: Partial<IngredientService> = {
-    getAllIngredients: jest
-      .fn()
-      .mockImplementation((fill = false) =>
-        fill ? [POPULATED_INGREDIENT] : [INGREDIENT],
-      ),
-    getIngredientById: jest
-      .fn()
-      .mockImplementation((id: string, fill = false) =>
-        fill ? POPULATED_INGREDIENT : INGREDIENT,
-      ),
-  };
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-      // .overrideProvider(IngredientService)
-      // .useValue(mockIngredientService)
       .overrideProvider(IngredientRepository)
       .useValue(mockIngredientRepository)
       .overrideProvider(SchedulerService)
