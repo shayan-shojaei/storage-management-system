@@ -8,20 +8,17 @@ import BatchDTO from './dto/batch.dto';
 export class ActionsService {
   constructor(private readonly repository: ActionsRepository) {}
 
-  async addIngredient(add: AddDTO, storage: string) {
-    const storageId = new ObjectId(storage);
+  async addIngredient(add: AddDTO, storageId: ObjectId) {
     await this.checkStorage(storageId);
     return this.repository.addIngredient(add, storageId);
   }
 
-  async addIngredientsBatch(batch: BatchDTO, storage: string) {
-    const storageId = new ObjectId(storage);
+  async addIngredientsBatch(batch: BatchDTO, storageId: ObjectId) {
     await this.checkStorage(storageId);
     return this.repository.addBatchIngredient(batch, storageId);
   }
 
-  async useIngredientsBatch(batch: BatchDTO, storageId: string) {
-    const id = new ObjectId(storageId);
+  async useIngredientsBatch(batch: BatchDTO, id: ObjectId) {
     const storage = await this.checkStorage(id);
 
     // calculate new amounts after reduction

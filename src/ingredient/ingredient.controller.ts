@@ -28,6 +28,8 @@ import {
 } from './examples';
 import { createSchema } from '../utils/createSchema';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
+import ParseObjectId from '../pipes/parseObjectId.pipe';
+import { ObjectId } from 'mongodb';
 
 @Controller('ingredient')
 @UseInterceptors(ErrorInterceptor)
@@ -81,7 +83,7 @@ export default class IngredientController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by id' })
   @UseInterceptors(ResultTransformer(Ingredient))
-  getIngredientById(@Param('id') id: string) {
+  getIngredientById(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.ingredients.getIngredientById(id, false);
   }
 
@@ -93,7 +95,7 @@ export default class IngredientController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by id' })
   @UseInterceptors(ResultTransformer(PopulatedIngredient))
-  getPopulatedIngredientById(@Param('id') id: string) {
+  getPopulatedIngredientById(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.ingredients.getIngredientById(id, true);
   }
 
@@ -119,7 +121,7 @@ export default class IngredientController {
   @ApiOperation({ summary: 'Update ingredient by id' })
   @UseInterceptors(ResultTransformer(Ingredient))
   updateIngredientById(
-    @Param('id') id: string,
+    @Param('id', new ParseObjectId()) id: ObjectId,
     @Body() body: UpdateIngredientDTO,
   ) {
     return this.ingredients.updateIngredientById(id, body);

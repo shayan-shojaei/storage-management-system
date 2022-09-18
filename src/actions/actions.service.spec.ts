@@ -22,7 +22,7 @@ const batchIngredientDTO: BatchDTO | UseDTO = {
   ],
 };
 
-const storageId = '631d9d675237167ab2c1b75e';
+const storageId = new ObjectId();
 
 describe('ActionsService', () => {
   let service: ActionsService;
@@ -109,7 +109,7 @@ describe('ActionsService', () => {
     expect(await service.addIngredient(ingredientDTO, storageId)).toEqual({
       ...ingredientDTO,
       _id: expect.any(ObjectId),
-      storage: new ObjectId(storageId),
+      storage: storageId,
       createdAt: expect.any(Date),
     });
   });
@@ -121,7 +121,7 @@ describe('ActionsService', () => {
       batchIngredientDTO.ingredients.map((ingredient) => ({
         ...ingredient,
         _id: expect.any(ObjectId),
-        storage: new ObjectId(storageId),
+        storage: storageId,
         createdAt: expect.any(Date),
       })),
     );
@@ -136,7 +136,7 @@ describe('ActionsService', () => {
           ({
             ...ingredient,
             _id: expect.any(ObjectId),
-            storage: new ObjectId(storageId),
+            storage: storageId,
             createdAt: expect.any(Date),
           } as Ingredient),
       ),

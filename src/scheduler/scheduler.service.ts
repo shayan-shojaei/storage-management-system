@@ -29,9 +29,8 @@ export class SchedulerService implements OnApplicationBootstrap {
     return this.jobs.findAll();
   }
 
-  async findById(id: string) {
-    const jobId = new ObjectId(id);
-    return this.jobs.exists(jobId);
+  findById(id: ObjectId) {
+    return this.jobs.exists(id);
   }
 
   async create(createDto: BatchJobDTO) {
@@ -43,16 +42,15 @@ export class SchedulerService implements OnApplicationBootstrap {
     return job;
   }
 
-  async delete(id: string) {
+  async delete(id: ObjectId) {
     return this.deleteJob(id);
   }
 
-  async update(id: string, body: UpdateBatchJobDTO) {
-    const jobId = new ObjectId(id);
-    const newJob = await this.jobs.update(jobId, body);
+  async update(id: ObjectId, body: UpdateBatchJobDTO) {
+    const newJob = await this.jobs.update(id, body);
 
     // restart job
-    this.stopJob(id);
+    this.stopJob(id.toString());
     this.setupJob(newJob);
 
     return newJob;
@@ -87,18 +85,19 @@ export class SchedulerService implements OnApplicationBootstrap {
     return job;
   }
 
-  async deleteJob(id: string) {
+  async deleteJob(id: ObjectId) {
     // delete from database
-    const jobId = new ObjectId(id);
-    await this.jobs.exists(jobId);
-    const success = await this.jobs.delete(jobId);
+    await this.jobs.exists(id);
+    const success = await this.jobs.delete(id);
 
     if (!success) {
-      throw new BadGatewayException(`Failed to delete job with id ${id}`);
+      throw new BadGatewayException(
+        `Failed to delete job with id ${id.toString()}`,
+      );
     }
 
     // stop job
-    this.stopJob(id);
+    this.stopJob(id.toString());
 
     // successful deletion
     return {};
@@ -125,7 +124,10 @@ export class SchedulerService implements OnApplicationBootstrap {
         data: { ingredients, storageId },
       } = (await this.jobs.findById(jobId)) as Job<BatchData>;
 
-      await this.actions.addIngredientsBatch({ ingredients }, storageId);
+      await this.actions.addIngredientsBatch(
+        { ingredients },
+        new ObjectId(storageId),
+      );
     });
 
     this.schedulerRegistry.addCronJob(job._id.toString(), cronJob);

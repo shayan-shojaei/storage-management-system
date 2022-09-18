@@ -22,7 +22,7 @@ const BATCH_INGREDIENT: BatchDTO | UseDTO = {
   ingredients: [ADD_INGREDIENT_1, ADD_INGREDIENT_2],
 };
 
-const STORAGE_1 = '631d9d675237167ab2c1b75e';
+const STORAGE_1 = new ObjectId();
 
 describe('ActionsController', () => {
   let controller: ActionsController;

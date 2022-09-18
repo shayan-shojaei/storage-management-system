@@ -24,6 +24,8 @@ import { ALL_EXAMPLE, DELETE_EXAMPLE, SINGLE_EXAMPLE } from './examples';
 import { SchedulerService } from './scheduler.service';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
 import Job from './models/job.model';
+import ParseObjectId from '../pipes/parseObjectId.pipe';
+import { ObjectId } from 'mongodb';
 
 @Controller('scheduler')
 @UseInterceptors(ErrorInterceptor)
@@ -50,7 +52,7 @@ export class SchedulerController {
   })
   @ApiOperation({ summary: 'Get job data by id' })
   @UseInterceptors(ResultTransformer(Job))
-  getById(@Param('id') id: string) {
+  getById(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.scheduler.findById(id);
   }
 
@@ -76,7 +78,7 @@ export class SchedulerController {
   })
   @ApiOperation({ summary: 'Delete a scheduled job' })
   @UseInterceptors(ResultTransformer(Object))
-  delete(@Param('id') id: string) {
+  delete(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.scheduler.delete(id);
   }
 
@@ -90,7 +92,10 @@ export class SchedulerController {
   })
   @ApiOperation({ summary: 'Update a scheduled job' })
   @UseInterceptors(ResultTransformer(Job))
-  update(@Param('id') id: string, @Body() body: UpdateBatchJobDTO) {
+  update(
+    @Param('id', new ParseObjectId()) id: ObjectId,
+    @Body() body: UpdateBatchJobDTO,
+  ) {
     return this.scheduler.update(id, body);
   }
 }

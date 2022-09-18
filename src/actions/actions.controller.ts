@@ -23,6 +23,8 @@ import { ADD_BATCH_EXAMPLE, ADD_EXAMPLE } from './examples';
 import UseDTO from './dto/use.dto';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
 import Ingredient from '../ingredient/ingredient.model';
+import { ObjectId } from 'mongodb';
+import ParseObjectId from '../pipes/parseObjectId.pipe';
 
 @Controller('storage')
 @UseInterceptors(ErrorInterceptor)
@@ -40,7 +42,10 @@ export class ActionsController {
   @ApiOperation({ summary: 'Add single ingredient to storage' })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ResultTransformer(Ingredient))
-  add(@Param('storageId') storageId: string, @Body() body: AddDTO) {
+  add(
+    @Param('storageId', new ParseObjectId()) storageId: ObjectId,
+    @Body() body: AddDTO,
+  ) {
     return this.actions.addIngredient(body, storageId);
   }
 
@@ -55,7 +60,7 @@ export class ActionsController {
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ResultTransformer(Ingredient))
   async addBatch(
-    @Param('storageId') storageId: string,
+    @Param('storageId', new ParseObjectId()) storageId: ObjectId,
     @Body() body: BatchDTO,
   ) {
     return this.actions.addIngredientsBatch(body, storageId);
@@ -71,7 +76,10 @@ export class ActionsController {
   @ApiOperation({ summary: 'Use batch of ingredients from storage' })
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(ResultTransformer(Ingredient))
-  async useBatch(@Param('storageId') storageId: string, @Body() body: UseDTO) {
+  async useBatch(
+    @Param('storageId', new ParseObjectId()) storageId: ObjectId,
+    @Body() body: UseDTO,
+  ) {
     return this.actions.useIngredientsBatch(body, storageId);
   }
 }

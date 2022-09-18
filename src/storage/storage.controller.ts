@@ -31,6 +31,8 @@ import { SingleIngredientExample } from '../ingredient/examples';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
 import Storage, { PopulatedStorage } from './storage.model';
 import Ingredient from '../ingredient/ingredient.model';
+import ParseObjectId from '../pipes/parseObjectId.pipe';
+import { ObjectId } from 'mongodb';
 
 @Controller('storage')
 @UseInterceptors(ErrorInterceptor)
@@ -69,7 +71,7 @@ export default class StorageController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get storage data by id' })
   @UseInterceptors(ResultTransformer(Storage))
-  getStorageById(@Param('id') id: string) {
+  getStorageById(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.storage.getStorageById(id, false);
   }
 
@@ -83,7 +85,7 @@ export default class StorageController {
     summary: 'Get storage data by id, populated with ingredients',
   })
   @UseInterceptors(ResultTransformer(PopulatedStorage))
-  getPopulatedStorageById(@Param('id') id: string) {
+  getPopulatedStorageById(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.storage.getStorageById(id, true);
   }
 
@@ -109,7 +111,7 @@ export default class StorageController {
   @ApiOperation({ summary: 'Update storage by id' })
   @UseInterceptors(ResultTransformer(Storage))
   async updateStorage(
-    @Param('id') id: string,
+    @Param('id', new ParseObjectId()) id: ObjectId,
     @Body() storage: UpdateStorageDTO,
   ) {
     return this.storage.updateStorage(id, storage);
@@ -123,7 +125,7 @@ export default class StorageController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Delete storage by id' })
   @UseInterceptors(ResultTransformer(Object))
-  deleteStorage(@Param('id') id: string) {
+  deleteStorage(@Param('id', new ParseObjectId()) id: ObjectId) {
     return this.storage.deleteStorage(id);
   }
 
@@ -136,7 +138,7 @@ export default class StorageController {
   @ApiOperation({ summary: 'Get ingredient in storage by name' })
   @UseInterceptors(ResultTransformer(Ingredient))
   async getIngredientInStorage(
-    @Param('id') id: string,
+    @Param('id', new ParseObjectId()) id: ObjectId,
     @Param('ingredient') ingredientName: string,
   ) {
     return this.storage.getIngredientByName(id, ingredientName);

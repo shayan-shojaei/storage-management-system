@@ -14,23 +14,20 @@ export default class IngredientService {
     return this.ingredients.findAll(fill);
   }
 
-  async getIngredientById(id: string, fill = false) {
-    const objectId = new ObjectId(id);
-    const ingredients = await this.ingredients.exists(objectId, fill);
-    return ingredients;
+  async getIngredientById(id: ObjectId, fill = false) {
+    return this.ingredients.exists(id, fill);
   }
 
   async getIngredientsByName(name: string, fill = false) {
     return this.ingredients.findByName(name, fill);
   }
 
-  async updateIngredientById(id: string, update: UpdateIngredientDTO) {
-    const objectId = new ObjectId(id);
+  async updateIngredientById(id: ObjectId, update: UpdateIngredientDTO) {
     update.storage = new ObjectId(update.storage); // convert string to objectId
 
-    await this.ingredients.exists(objectId);
+    await this.ingredients.exists(id);
 
-    return this.ingredients.update(objectId, update);
+    return this.ingredients.update(id, update);
   }
 
   async updateIngredientByName(

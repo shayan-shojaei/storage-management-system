@@ -20,26 +20,19 @@ export default class StorageService {
     return this.storages.findAll(fill);
   }
 
-  async getStorageById(id: string, fill = false) {
-    const objectId = new ObjectId(id);
-
-    const storage = await this.storages.exists(objectId, fill);
-    return storage;
+  getStorageById(id: ObjectId, fill = false) {
+    return this.storages.exists(id, fill);
   }
 
-  async getIngredientByName(id: string, ingredientName: string) {
-    const objectId = new ObjectId(id);
-    await this.storages.exists(objectId);
+  async getIngredientByName(id: ObjectId, ingredientName: string) {
+    await this.storages.exists(id);
 
-    const ingredient = await this.ingredients.findInStorage(
-      objectId,
-      ingredientName,
-    );
+    const ingredient = await this.ingredients.findInStorage(id, ingredientName);
 
     if (ingredient) return ingredient;
 
     throw new NotFoundException(
-      `Ingredient with name ${ingredientName} was not found in storage ${id}`,
+      `Ingredient with name ${ingredientName} was not found in storage ${id.toString()}`,
     );
   }
 
@@ -47,22 +40,21 @@ export default class StorageService {
     return this.storages.create(storageDto);
   }
 
-  async updateStorage(id: string, storageDto: UpdateStorageDTO) {
-    const objectId = new ObjectId(id);
-    await this.storages.exists(objectId);
-
-    return this.storages.update(objectId, storageDto);
+  async updateStorage(id: ObjectId, storageDto: UpdateStorageDTO) {
+    await this.storages.exists(id);
+    return this.storages.update(id, storageDto);
   }
 
-  async deleteStorage(id: string) {
-    const objectId = new ObjectId(id);
-    await this.storages.exists(objectId);
-    const { deletedCount } = await this.storages.delete(objectId);
+  async deleteStorage(id: ObjectId) {
+    await this.storages.exists(id);
+    const { deletedCount } = await this.storages.delete(id);
     if (deletedCount === 1) {
       // successful deletion
       return {};
     }
 
-    throw new BadGatewayException(`Failed to delete storage with id ${id}`);
+    throw new BadGatewayException(
+      `Failed to delete storage with id ${id.toString()}`,
+    );
   }
 }
