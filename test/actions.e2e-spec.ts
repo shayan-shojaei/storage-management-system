@@ -4,9 +4,7 @@ import { ObjectId } from 'mongodb';
 import * as request from 'supertest';
 import ActionsRepository from '../src/actions/actions.repository';
 import { AppModule } from '../src/app.module';
-import Ingredient, {
-  PopulatedIngredient,
-} from '../src/ingredient/ingredient.model';
+import Ingredient from '../src/ingredient/ingredient.model';
 import { SchedulerService } from '../src/scheduler/scheduler.service';
 import Storage from '../src/storage/storage.model';
 

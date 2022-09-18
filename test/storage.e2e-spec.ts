@@ -95,25 +95,29 @@ describe('/storage', () => {
       });
   });
 
-  it('/storage?fill=true GET', () => {
-    return request(app.getHttpServer()).get('/storage?fill=true').expect(200);
-    /* .expect({
-        success: true,
-        count: 1,
-        data: [
-          {
-            _id: STORAGE._id.toString(),
-            createdAt: STORAGE.createdAt.toISOString(),
-            ingredients: expect.arrayContaining([
-              expect.objectContaining({
-                _id: INGREDIENT._id.toString(),
-                storage: undefined,
-              }),
-            ]),
-            name: STORAGE.name,
-          },
-        ],
-      }); */
+  it('/storage?fill=true GET', async () => {
+    const { body } = await request(app.getHttpServer())
+      .get('/storage?fill=true')
+      .expect(200);
+    expect(body).toEqual({
+      success: true,
+      count: 1,
+      data: [
+        {
+          _id: STORAGE._id.toString(),
+          createdAt: STORAGE.createdAt.toISOString(),
+          ingredients: [
+            {
+              ...INGREDIENT,
+              createdAt: INGREDIENT.createdAt.toISOString(),
+              _id: INGREDIENT._id.toString(),
+              storage: INGREDIENT.storage.toString(),
+            },
+          ],
+          name: STORAGE.name,
+        },
+      ],
+    });
   });
 
   it('/storage/{id} GET', () => {
@@ -131,24 +135,26 @@ describe('/storage', () => {
       });
   });
 
-  it('/storage/{id}?fill=true GET', () => {
-    return request(app.getHttpServer())
+  it('/storage/{id}?fill=true GET', async () => {
+    const { body } = await request(app.getHttpServer())
       .get(`/storage/${STORAGE._id.toString()}?fill=true`)
       .expect(200);
-    /* .expect({
-        success: true,
-        data: {
-          _id: STORAGE._id.toString(),
-          createdAt: STORAGE.createdAt.toISOString(),
-          ingredients: [
-            expect.objectContaining({
-              _id: INGREDIENT._id.toString(),
-              storage: undefined,
-            }),
-          ],
-          name: STORAGE.name,
-        },
-      }); */
+    expect(body).toEqual({
+      success: true,
+      data: {
+        _id: STORAGE._id.toString(),
+        createdAt: STORAGE.createdAt.toISOString(),
+        ingredients: [
+          {
+            ...INGREDIENT,
+            createdAt: INGREDIENT.createdAt.toISOString(),
+            _id: INGREDIENT._id.toString(),
+            storage: INGREDIENT.storage.toString(),
+          },
+        ],
+        name: STORAGE.name,
+      },
+    });
   });
 
   it('/storage/{id}/{ingredient} GET', () => {
