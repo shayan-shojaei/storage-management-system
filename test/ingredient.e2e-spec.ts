@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import UpdateIngredientDTO from '../src/ingredient/dto/updateIngredient.dto';
+import UpdateIngredientByNameDTO from '../src/ingredient/dto/updateIngredientByName.dto';
 import Ingredient, {
   PopulatedIngredient,
 } from '../src/ingredient/ingredient.model';
@@ -144,6 +146,9 @@ describe('/ingredient', () => {
   it('/ingredient/{id} PUT', () => {
     return request(app.getHttpServer())
       .put(`/ingredient/${INGREDIENT._id.toString()}`)
+      .send({
+        name: INGREDIENT.name,
+      } as UpdateIngredientDTO)
       .expect(200)
       .expect({
         success: true,
@@ -173,6 +178,9 @@ describe('/ingredient', () => {
   it('/ingredient/{name}/all PUT', () => {
     return request(app.getHttpServer())
       .put(`/ingredient/${INGREDIENT.name}/all`)
+      .send({
+        name: INGREDIENT.name,
+      } as UpdateIngredientByNameDTO)
       .expect(200)
       .expect({
         success: true,

@@ -3,6 +3,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import * as request from 'supertest';
 import ActionsRepository from '../src/actions/actions.repository';
+import AddDTO from '../src/actions/dto/add.dto';
+import BatchDTO from '../src/actions/dto/batch.dto';
+import UseDTO from '../src/actions/dto/use.dto';
 import { AppModule } from '../src/app.module';
 import Ingredient from '../src/ingredient/ingredient.model';
 import { SchedulerService } from '../src/scheduler/scheduler.service';
@@ -54,6 +57,11 @@ describe('/storage (actions)', () => {
   it('/storage/{id}/add POST', () => {
     return request(app.getHttpServer())
       .post(`/storage/${STORAGE._id.toString()}/add`)
+      .send({
+        amount: INGREDIENT.amount,
+        name: INGREDIENT.name,
+        unit: INGREDIENT.unit,
+      } as AddDTO)
       .expect(200)
       .expect({
         success: true,
@@ -69,6 +77,15 @@ describe('/storage (actions)', () => {
   it('/storage/{id}/batch POST', () => {
     return request(app.getHttpServer())
       .post(`/storage/${STORAGE._id.toString()}/batch`)
+      .send({
+        ingredients: [
+          {
+            amount: INGREDIENT.amount,
+            name: INGREDIENT.name,
+            unit: INGREDIENT.unit,
+          },
+        ],
+      } as BatchDTO)
       .expect(200)
       .expect({
         success: true,
@@ -87,6 +104,15 @@ describe('/storage (actions)', () => {
   it('/storage/{id}/use POST', () => {
     return request(app.getHttpServer())
       .post(`/storage/${STORAGE._id.toString()}/use`)
+      .send({
+        ingredients: [
+          {
+            amount: INGREDIENT.amount,
+            name: INGREDIENT.name,
+            unit: INGREDIENT.unit,
+          },
+        ],
+      } as UseDTO)
       .expect(200)
       .expect({
         success: true,

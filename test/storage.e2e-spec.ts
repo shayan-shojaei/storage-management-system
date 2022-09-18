@@ -5,6 +5,8 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import Ingredient from '../src/ingredient/ingredient.model';
 import { SchedulerService } from '../src/scheduler/scheduler.service';
+import CreateStorageDTO from '../src/storage/dto/createStorage.dto';
+import UpdateStorageDTO from '../src/storage/dto/updateStorage.dto';
 import Storage, { PopulatedStorage } from '../src/storage/storage.model';
 import StorageRepository from '../src/storage/storage.repository';
 import StorageService from '../src/storage/storage.service';
@@ -175,6 +177,9 @@ describe('/storage', () => {
   it('/storage POST', () => {
     return request(app.getHttpServer())
       .post('/storage')
+      .send({
+        name: STORAGE.name,
+      } as CreateStorageDTO)
       .expect(201)
       .expect({
         success: true,
@@ -190,6 +195,7 @@ describe('/storage', () => {
   it('/storage/{id} PUT', () => {
     return request(app.getHttpServer())
       .put(`/storage/${STORAGE._id.toString()}`)
+      .send({ name: STORAGE.name } as UpdateStorageDTO)
       .expect(200)
       .expect({
         success: true,
