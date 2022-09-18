@@ -1,8 +1,4 @@
-import {
-  CacheInterceptor,
-  CacheModule,
-  INestApplication,
-} from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ObjectId } from 'mongodb';
 import * as request from 'supertest';
