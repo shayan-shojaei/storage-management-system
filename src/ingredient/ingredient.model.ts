@@ -51,6 +51,8 @@ export class PopulatedIngredient implements Omit<Ingredient, 'storage'> {
   createdAt: Date;
   name: string;
   unit: 'KG' | 'G' | 'L' | 'ML' | 'M' | 'CM';
+
+  @Type(() => Storage)
   storage: Storage;
 
   constructor(ingredient: Ingredient, storage: Storage) {

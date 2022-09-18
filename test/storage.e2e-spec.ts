@@ -97,9 +97,9 @@ describe('/storage', () => {
       });
   });
 
-  it('/storage?fill=true GET', async () => {
+  it('/storage/populated GET', async () => {
     const { body } = await request(app.getHttpServer())
-      .get('/storage?fill=true')
+      .get('/storage/populated')
       .expect(200);
     expect(body).toEqual({
       success: true,
@@ -137,9 +137,9 @@ describe('/storage', () => {
       });
   });
 
-  it('/storage/{id}?fill=true GET', async () => {
+  it('/storage/{id}/populated GET', async () => {
     const { body } = await request(app.getHttpServer())
-      .get(`/storage/${STORAGE._id.toString()}?fill=true`)
+      .get(`/storage/${STORAGE._id.toString()}/populated`)
       .expect(200);
     expect(body).toEqual({
       success: true,

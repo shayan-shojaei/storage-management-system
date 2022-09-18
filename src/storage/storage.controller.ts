@@ -7,7 +7,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UseInterceptors,
 } from '@nestjs/common';
 import CreateStorageDTO from './dto/createStorage.dto';
@@ -18,7 +17,6 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import UpdateStorageDTO from './dto/updateStorage.dto';
@@ -31,11 +29,11 @@ import {
 import { createSchema } from '../utils/createSchema';
 import { SingleIngredientExample } from '../ingredient/examples';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
-import PopulateQuery from '../middleware/populateQuery.middleware';
+import Storage, { PopulatedStorage } from './storage.model';
+import Ingredient from '../ingredient/ingredient.model';
 
 @Controller('storage')
 @UseInterceptors(ErrorInterceptor)
-@UseInterceptors(ResultTransformer)
 @UseInterceptors(CacheInterceptor)
 @ApiTags('Storage')
 export default class StorageController {
@@ -47,14 +45,20 @@ export default class StorageController {
     schema: createSchema(AllStoragesExample),
   })
   @ApiOperation({ summary: 'Get all storages' })
-  @ApiQuery({
-    name: 'fill',
-    enum: ['true', 'false'],
-    description: 'Populates the ingredients field if true is passed',
+  @UseInterceptors(ResultTransformer(Storage))
+  getAllStorages() {
+    return this.storage.getAllStorages(false);
+  }
+
+  @Get('/populated')
+  @ApiOkResponse({
+    description: 'Array of storages, populated with ingredients',
+    schema: createSchema(AllStoragesExample),
   })
-  @UseInterceptors(PopulateQuery)
-  getAllStorages(@Query('fill') fill: boolean) {
-    return this.storage.getAllStorages(fill);
+  @ApiOperation({ summary: 'Get all storages, populated with ingredients' })
+  @UseInterceptors(ResultTransformer(PopulatedStorage))
+  getAllPopulatedStorages() {
+    return this.storage.getAllStorages(true);
   }
 
   @Get('/:id')
@@ -64,14 +68,23 @@ export default class StorageController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get storage data by id' })
-  @ApiQuery({
-    name: 'fill',
-    enum: ['true', 'false'],
-    description: 'Populates the ingredients field if true is passed',
+  @UseInterceptors(ResultTransformer(Storage))
+  getStorageById(@Param('id') id: string) {
+    return this.storage.getStorageById(id, false);
+  }
+
+  @Get('/:id/populated')
+  @ApiOkResponse({
+    description: 'Single storage data, populated with ingredients',
+    schema: createSchema(SingleStorageExample),
   })
-  @UseInterceptors(PopulateQuery)
-  getStorageById(@Param('id') id: string, @Query('fill') fill: boolean) {
-    return this.storage.getStorageById(id, fill);
+  @ApiNotFoundResponse()
+  @ApiOperation({
+    summary: 'Get storage data by id, populated with ingredients',
+  })
+  @UseInterceptors(ResultTransformer(PopulatedStorage))
+  getPopulatedStorageById(@Param('id') id: string) {
+    return this.storage.getStorageById(id, true);
   }
 
   @Post()
@@ -81,6 +94,7 @@ export default class StorageController {
     schema: createSchema(SingleStorageExample),
   })
   @ApiOperation({ summary: 'Create new storage' })
+  @UseInterceptors(ResultTransformer(Storage))
   createStorage(@Body() storage: CreateStorageDTO) {
     return this.storage.createStorage(storage);
   }
@@ -93,6 +107,7 @@ export default class StorageController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Update storage by id' })
+  @UseInterceptors(ResultTransformer(Storage))
   async updateStorage(
     @Param('id') id: string,
     @Body() storage: UpdateStorageDTO,
@@ -107,6 +122,7 @@ export default class StorageController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Delete storage by id' })
+  @UseInterceptors(ResultTransformer(Object))
   deleteStorage(@Param('id') id: string) {
     return this.storage.deleteStorage(id);
   }
@@ -118,6 +134,7 @@ export default class StorageController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient in storage by name' })
+  @UseInterceptors(ResultTransformer(Ingredient))
   async getIngredientInStorage(
     @Param('id') id: string,
     @Param('ingredient') ingredientName: string,

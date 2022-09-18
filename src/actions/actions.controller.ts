@@ -22,10 +22,10 @@ import BatchDTO from './dto/batch.dto';
 import { ADD_BATCH_EXAMPLE, ADD_EXAMPLE } from './examples';
 import UseDTO from './dto/use.dto';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
+import Ingredient from '../ingredient/ingredient.model';
 
 @Controller('storage')
 @UseInterceptors(ErrorInterceptor)
-@UseInterceptors(ResultTransformer)
 @ApiTags('Actions')
 export class ActionsController {
   constructor(private readonly actions: ActionsService) {}
@@ -39,6 +39,7 @@ export class ActionsController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Add single ingredient to storage' })
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ResultTransformer(Ingredient))
   add(@Param('storageId') storageId: string, @Body() body: AddDTO) {
     return this.actions.addIngredient(body, storageId);
   }
@@ -52,6 +53,7 @@ export class ActionsController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Add batch of ingredients to storage' })
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ResultTransformer(Ingredient))
   async addBatch(
     @Param('storageId') storageId: string,
     @Body() body: BatchDTO,
@@ -68,6 +70,7 @@ export class ActionsController {
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Use batch of ingredients from storage' })
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ResultTransformer(Ingredient))
   async useBatch(@Param('storageId') storageId: string, @Body() body: UseDTO) {
     return this.actions.useIngredientsBatch(body, storageId);
   }

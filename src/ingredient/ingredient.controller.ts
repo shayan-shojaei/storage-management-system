@@ -27,19 +27,16 @@ import {
   TotalIngredientExample,
 } from './examples';
 import { createSchema } from '../utils/createSchema';
-import PopulateQuery from '../middleware/populateQuery.middleware';
 import ResultTransformer from '../middleware/resultTransformer.transformer';
 
 @Controller('ingredient')
 @UseInterceptors(ErrorInterceptor)
-@UseInterceptors(ResultTransformer)
 @UseInterceptors(CacheInterceptor)
 @ApiTags('Ingredients')
 export default class IngredientController {
   constructor(private readonly ingredients: IngredientService) {}
 
   @Get()
-  @UseInterceptors(PopulateQuery)
   @ApiOkResponse({
     description: 'List of all ingredients',
     schema: createSchema(AllIngredientsExample),
@@ -50,39 +47,54 @@ export default class IngredientController {
     description: 'Get ingredients by name (across all storages)',
     required: false,
   })
-  @ApiQuery({
-    name: 'fill',
-    enum: ['true', 'false'],
-    description: 'Populates the storage field if true is passed',
+  @UseInterceptors(ResultTransformer(Ingredient))
+  async getAllIngredients(@Query('name') name?: string) {
+    return name
+      ? this.ingredients.getIngredientsByName(name, false)
+      : this.ingredients.getAllIngredients(false);
+  }
+
+  @Get('/populated')
+  @ApiOkResponse({
+    description: 'List of all ingredients, populated with storage data',
+    schema: createSchema(AllIngredientsExample),
   })
-  async getAllIngredients(
-    @Query('fill') fill?: boolean,
-    @Query('name') name?: string,
-  ) {
-    let ingredients: Ingredient[] | PopulatedIngredient[];
-    if (!name) {
-      ingredients = await this.ingredients.getAllIngredients(fill);
-    } else {
-      ingredients = await this.ingredients.getIngredientsByName(name, fill);
-    }
-    return ingredients;
+  @ApiOperation({ summary: 'Get all ingredients, populated with storage data' })
+  @ApiQuery({
+    name: 'name',
+    description:
+      'Get ingredients by name (across all storages), populated with storage data',
+    required: false,
+  })
+  @UseInterceptors(ResultTransformer(PopulatedIngredient))
+  async getAllPopulatedIngredients(@Query('name') name?: string) {
+    return name
+      ? this.ingredients.getIngredientsByName(name, true)
+      : this.ingredients.getAllIngredients(true);
   }
 
   @Get('/:id')
-  @UseInterceptors(PopulateQuery)
   @ApiOkResponse({
     description: 'Single ingredient data',
     schema: createSchema(SingleIngredientExample),
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by id' })
-  @ApiQuery({
-    name: 'fill',
-    enum: ['true', 'false'],
-    description: 'Populates the storage field if true is passed',
+  @UseInterceptors(ResultTransformer(Ingredient))
+  getIngredientById(@Param('id') id: string) {
+    return this.ingredients.getIngredientById(id, false);
+  }
+
+  @Get('/:id/populated')
+  @ApiOkResponse({
+    description: 'Single ingredient data, populated with storage data',
+    schema: createSchema(SingleIngredientExample),
   })
-  getIngredientById(@Param('id') id: string, @Query('fill') fill: boolean) {
-    return this.ingredients.getIngredientById(id, fill);
+  @ApiNotFoundResponse()
+  @ApiOperation({ summary: 'Get ingredient data by id' })
+  @UseInterceptors(ResultTransformer(PopulatedIngredient))
+  getPopulatedIngredientById(@Param('id') id: string) {
+    return this.ingredients.getIngredientById(id, true);
   }
 
   @Get('/:name/total')
@@ -92,6 +104,7 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Get ingredient data by name across all storages' })
+  @UseInterceptors(ResultTransformer(Ingredient))
   getTotalIngredientData(@Param('name') name: string) {
     return this.ingredients.getTotalIngredientData(name);
   }
@@ -104,6 +117,7 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Update ingredient by id' })
+  @UseInterceptors(ResultTransformer(Ingredient))
   updateIngredientById(
     @Param('id') id: string,
     @Body() body: UpdateIngredientDTO,
@@ -119,6 +133,7 @@ export default class IngredientController {
   })
   @ApiNotFoundResponse()
   @ApiOperation({ summary: 'Update ingredients by name' })
+  @UseInterceptors(ResultTransformer(Ingredient))
   updateIngredientByName(
     @Param('name') name: string,
     @Body() body: UpdateIngredientByNameDTO,

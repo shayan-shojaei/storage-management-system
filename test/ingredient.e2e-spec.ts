@@ -13,9 +13,10 @@ import { SchedulerService } from '../src/scheduler/scheduler.service';
 import Storage from '../src/storage/storage.model';
 
 const INGREDIENT_ID = new ObjectId();
+const STORAGE_ID = new ObjectId();
 
 const STORAGE: Storage = {
-  _id: new ObjectId(),
+  _id: STORAGE_ID,
   createdAt: new Date(),
   name: 'Storage',
   ingredients: [INGREDIENT_ID],
@@ -88,9 +89,9 @@ describe('/ingredient', () => {
       });
   });
 
-  it('/ingredient?fill=true GET', async () => {
+  it('/ingredient/populated GET', async () => {
     const { body } = await request(app.getHttpServer())
-      .get('/ingredient?fill=true')
+      .get('/ingredient/populated')
       .expect(200);
     expect(body).toEqual({
       success: true,
@@ -100,9 +101,12 @@ describe('/ingredient', () => {
           ...INGREDIENT,
           _id: INGREDIENT._id.toString(),
           createdAt: INGREDIENT.createdAt.toISOString(),
-          storage: expect.objectContaining({
-            _id: STORAGE._id.toString(),
-          }),
+          storage: {
+            ...STORAGE,
+            _id: STORAGE_ID.toString(),
+            ingredients: [INGREDIENT._id.toString()],
+            createdAt: STORAGE.createdAt.toISOString(),
+          },
         },
       ],
     });
@@ -123,9 +127,9 @@ describe('/ingredient', () => {
       });
   });
 
-  it('/ingredient/{id}?fill=true GET', async () => {
+  it('/ingredient/{id}/populated GET', async () => {
     const { body } = await request(app.getHttpServer())
-      .get(`/ingredient/${INGREDIENT._id.toString()}?fill=true`)
+      .get(`/ingredient/${INGREDIENT._id.toString()}/populated`)
       .expect(200);
     expect(body).toEqual({
       success: true,

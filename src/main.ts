@@ -20,9 +20,6 @@ async function bootstrap() {
   // Validation Pipe
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  // Transformation Interceptor
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-
   // Swagger
   const options = new DocumentBuilder()
     .setTitle('Restaurant Management System')
