@@ -23,7 +23,7 @@ async function bootstrap() {
   // Swagger
   const options = new DocumentBuilder()
     .setTitle('Restaurant Management System')
-    .setVersion('0.0.1')
+    .setVersion('0.2.0')
     .setDescription('The API for the RMS')
     .build();
   const document = SwaggerModule.createDocument(app, options);
