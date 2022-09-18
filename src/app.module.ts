@@ -7,6 +7,9 @@ import IngredientModule from './ingredient/ingredient.module';
 import StorageModule from './storage/storage.module';
 import * as redisStore from 'cache-manager-redis-store';
 
+// lower the cache ttl for developement
+const CACHE_TTL = process.env.NODE_ENV === 'production' ? 10 : 1;
+
 @Module({
   imports: [
     // Configurations
@@ -21,7 +24,7 @@ import * as redisStore from 'cache-manager-redis-store';
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
       password: process.env.REDIS_PASSWORD,
-      ttl: 1,
+      ttl: CACHE_TTL,
       max: 100,
       isGlobal: true,
     }),
